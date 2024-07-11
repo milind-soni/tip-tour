@@ -1,0 +1,36 @@
+{
+  "name": "tiptour-selector",
+  "version": "1.0.0",
+  "description": "",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/tiptour-selector.umd.js",
+  "module": "./dist/tiptour-selector.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/tiptour-selector.es.js",
+      "require": "./dist/tiptour-selector.umd.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "watch": "nodemon -e ts,html --exec \"npm run build\"",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "nodemonConfig": {
+    "ignore": [
+      "./dist/**"
+    ]
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "terser": "^5.31.2",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.3"
+  }
+}
