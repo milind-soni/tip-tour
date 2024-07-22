@@ -1,4 +1,4 @@
-import FollowBox from "./utils/FollowBox";
+import FollowBox from "./utils/FollowBox/FollowBox";
 import Overlay from "./utils/Overlay";
 
 // All data attributes in current script

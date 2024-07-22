@@ -1,4 +1,4 @@
-import { styles } from "./FollowBox/style";
+import { styles } from "./style";
 
 class FollowBox {
   private followBox: HTMLDivElement | null = null;
