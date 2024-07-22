@@ -4,6 +4,7 @@ class FollowBox {
   private followBox: HTMLDivElement | null = null;
   private animationFrameId: number | null = null;
   private followBoxOffset = 15;
+  private message = "";
 
   constructor() {
     this.init();
@@ -86,6 +87,11 @@ class FollowBox {
       this.followBox = null;
       this.animationFrameId = null;
     }
+  }
+
+  public setContent(message: string) {
+    this.message = message;
+    this.followBox!.innerText = this.message;
   }
 }
 

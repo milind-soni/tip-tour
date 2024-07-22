@@ -1,3 +1,7 @@
+import { OverlayEvent } from "./OverlayEvent";
+
+const overlayEvent = new OverlayEvent("tipContentUpdate");
+
 export default function (event: MouseEvent) {
   let element = event.target as HTMLElement;
 
@@ -14,7 +18,18 @@ export default function (event: MouseEvent) {
 
   const dataTipElement = findDataTipElement(element);
 
-  if (!dataTipElement) return;
+  if (!dataTipElement) {
+    overlayEvent.dispatch({
+      noTip: true,
+      message: "Hmmm, nothing yet",
+    });
+    return;
+  }
+
+  overlayEvent.dispatch({
+    noTip: false,
+    message: dataTipElement.getAttribute("data-tip") as string,
+  });
 
   // $TipStore.message = dataTipElement.getAttribute("data-tip") as string;
   const existingOverlay = document.getElementById("data-tip-overlay");

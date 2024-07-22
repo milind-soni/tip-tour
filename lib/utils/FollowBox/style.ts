@@ -9,4 +9,5 @@ export const styles = {
   "box-shadow": "0 0 20px rgba(16, 0, 54, 0.2)",
   transition: "0.1s ease-out",
   "z-index": "1000",
+  padding: "10px",
 };
