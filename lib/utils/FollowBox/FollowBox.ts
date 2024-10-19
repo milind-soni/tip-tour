@@ -2,96 +2,125 @@ import { styles } from "./style";
 
 class FollowBox {
   private followBox: HTMLDivElement | null = null;
+  private displayArea: HTMLDivElement | null = null;
+  private input: HTMLInputElement | null = null;
   private animationFrameId: number | null = null;
   private followBoxOffset = 15;
-  private message = "";
 
   constructor() {
     this.init();
   }
 
-  /**
-   * Checks if the device is a touch device.
-   * @returns {boolean} True if the device is a touch device, false otherwise.
-   */
-  private isTouchDevice(): boolean {
-    try {
-      // We try to create TouchEvent. It would fail for desktops and throw an error
-      document.createEvent("TouchEvent");
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-  /**
-   * Moves the follow box based on the mouse or touch event.
-   * @param event - The mouse or touch event.
-   */
-  private move = (event: MouseEvent | TouchEvent) => {
-    try {
-      const x = !this.isTouchDevice()
-        ? (event as MouseEvent).pageX
-        : (event as TouchEvent).touches[0].pageX;
-      const y = !this.isTouchDevice()
-        ? (event as MouseEvent).pageY
-        : (event as TouchEvent).touches[0].pageY;
-
-      // Check if the mouse is near the top of the screen
-      const isNearTop =
-        y < this.followBoxOffset * 2 + this.followBox!.clientHeight;
-
-      // Check if the mouse is near the right of the screen
-      const isNearRight =
-        x >
-        window.innerWidth -
-          this.followBoxOffset * 2 -
-          this.followBox!.clientWidth;
-
-      // Calculate the new position of the follow box
-      let newX = x + this.followBoxOffset + this.followBox!.clientWidth / 2;
-      let newY = y - this.followBoxOffset - this.followBox!.clientHeight / 2;
-
-      // Adjust the position if necessary
-      if (isNearTop) {
-        newY = y + this.followBoxOffset + this.followBox!.clientHeight / 2;
-      }
-      if (isNearRight) {
-        newX = x - this.followBoxOffset - this.followBox!.clientWidth / 2;
-      }
-
-      this.followBox!.style.left = `${newX}px`;
-      this.followBox!.style.top = `${newY}px`;
-    } catch (e) {
-      // Handle any errors
-    }
-  };
-
   private init() {
-    document.addEventListener("mousemove", this.move);
-    document.addEventListener("touchmove", this.move);
+    this.createFollowBox();
+    console.log("FollowBox initialized");
   }
 
   public createFollowBox() {
     this.followBox = document.createElement("div");
     Object.assign(this.followBox.style, styles);
     this.followBox.style.position = "fixed";
-    this.followBox.style.pointerEvents = "none"; // Ensure the box doesn't interfere with mouse events
+    this.followBox.style.bottom = "20px";
+    this.followBox.style.right = "20px";
+    this.followBox.style.width = "300px";
+    this.followBox.style.backgroundColor = "#f0f0f0";
+    this.followBox.style.padding = "10px";
+    this.followBox.style.borderRadius = "5px";
+    this.followBox.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
     this.followBox.className = "tip-comment";
+
+    this.displayArea = document.createElement("div");
+    this.displayArea.style.marginBottom = "10px";
+    this.displayArea.style.minHeight = "50px";
+    this.followBox.appendChild(this.displayArea);
+
+    this.input = document.createElement("input");
+    this.input.type = "text";
+    this.input.placeholder = "Type your tour step here...";
+    this.input.style.width = "100%";
+    this.input.style.padding = "5px";
+    this.input.style.boxSizing = "border-box";
+
+    this.followBox.appendChild(this.input);
     document.body.appendChild(this.followBox);
+
+    console.log("FollowBox created with display area and input:", this.displayArea, this.input);
+  }
+
+  public handleKeyPress = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      console.log("Enter key pressed");
+      this.handleEnterPress();
+      event.preventDefault();
+    }
+  };
+
+  private handleEnterPress = () => {
+    console.log("handleEnterPress called");
+    if (!this.input) {
+      console.error("Input element is null");
+      return;
+    }
+    const inputText = this.input.value.trim();
+    console.log("Input text:", inputText);
+    if (inputText) {
+      this.sendToOpenAI(inputText);
+      this.input.value = '';  // Clear the input after sending
+    } else {
+      console.log("Input is empty, not sending to OpenAI");
+    }
+  };
+
+  private sendToOpenAI = async (text: string) => {
+    console.log("Sending to OpenAI:", text);
+    this.setContent("Sending to OpenAI...");
+    try {
+      const response = await fetch('/api/openai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: text }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      if ('error' in data) {
+        throw new Error(data.error);
+      }
+      console.log("Response from OpenAI:", data.response);
+      this.setContent(data.response);
+    } catch (error) {
+      console.error('Error sending to OpenAI:', error);
+      let errorMessage = "Couldn't get a response from OpenAI.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      this.setContent(`Error: ${errorMessage}`);
+    }
+  };
+
+  public setContent(message: string) {
+    if (this.displayArea) {
+      this.displayArea.textContent = message;
+      console.log("Content set in display area:", message);
+    } else {
+      console.error("Display area not found when trying to set content");
+    }
   }
 
   public destroyFollowBox() {
     if (this.followBox) {
-      cancelAnimationFrame(this.animationFrameId!);
       document.body.removeChild(this.followBox);
       this.followBox = null;
+      this.displayArea = null;
+      this.input = null;
       this.animationFrameId = null;
+      console.log("FollowBox destroyed");
     }
-  }
-
-  public setContent(message: string) {
-    this.message = message;
-    this.followBox!.innerText = this.message;
   }
 }
 

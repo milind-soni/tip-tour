@@ -1,25 +1,48 @@
 import FollowBox from "./utils/FollowBox/FollowBox";
 import Overlay from "./utils/Overlay/Overlay";
-import type { OverlayEvent } from "./utils/Overlay/OverlayEvent";
 
-// All data attributes in current script
-// const scriptTag = document.currentScript;
-// const dataAttributes = scriptTag?.dataset as {
-//   token: string;
-// };``
-
-const followBox = new FollowBox();
-document.addEventListener("mousemove", (event: MouseEvent) => {
-  Overlay(event);
-});
+let followBox: FollowBox;
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM fully loaded and parsed");
-  followBox.createFollowBox();
-});
+  followBox = new FollowBox();
 
-document.addEventListener("tipContentUpdate", (event: Event) => {
-  const overlayEvent = event as OverlayEvent;
-  // console.log(overlayEvent.getData());
-  followBox.setContent(overlayEvent.getData().message);
+  document.addEventListener("mousemove", (event) => {
+    Overlay(event);
+  });
+
+  document.addEventListener("tipContentUpdate", (event) => {
+    console.log("tipContentUpdate event received", event);
+    const customEvent = event as CustomEvent;
+    const data = customEvent.detail;
+    
+    if (data) {
+      if (data.noTip) {
+        console.log("No tip data", data);
+        followBox.setContent("Hmmm, nothing here yet.");
+      } else {
+        console.log("Tip data", data);
+        const content = `Hovered: ${data.message}\nElement: ${data.elementInfo.tag}`;
+        followBox.setContent(content);
+        console.log("Element Info:", data.elementInfo);
+      }
+    } else {
+      console.error("No data received in tipContentUpdate event");
+    }
+  });
+
+  // Add global keydown event listener
+  document.addEventListener("keydown", (event) => {
+    followBox.handleKeyPress(event);
+  });
+
+  console.log("Event listeners set up");
+
+  // Test function to simulate Enter key press
+  (window as any).testEnterPress = () => {
+    const event = new KeyboardEvent('keydown', { key: 'Enter' });
+    document.dispatchEvent(event);
+  };
+
+  console.log("Setup complete, you can now use the FollowBox");
 });

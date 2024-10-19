@@ -5,7 +5,6 @@ const overlayEvent = new OverlayEvent("tipContentUpdate");
 export default function (event: MouseEvent) {
   let element = event.target as HTMLElement;
 
-  // Function to check if element or any of its parents has the 'data-tip' attribute
   const findDataTipElement = (el: HTMLElement | null) => {
     while (el && el !== document.body) {
       if (el.hasAttribute("data-tip")) {
@@ -19,18 +18,36 @@ export default function (event: MouseEvent) {
   const dataTipElement = findDataTipElement(element);
 
   if (!dataTipElement) {
+    console.log("Dispatching event with no tip");
     overlayEvent.dispatch({
       noTip: true,
       message: "Hmmm, nothing yet",
+      elementInfo: null
     });
     return;
   }
 
+  const elementInfo = {
+    tag: dataTipElement.tagName,
+    id: dataTipElement.id,
+    classes: Array.from(dataTipElement.classList),
+    attributes: Array.from(dataTipElement.attributes).map(attr => ({
+      name: attr.name,
+      value: attr.value
+    }))
+  };
+
+  console.log("Dispatching event with tip", {
+    noTip: false,
+    message: dataTipElement.getAttribute("data-tip") as string,
+    elementInfo: elementInfo
+  });
+
   overlayEvent.dispatch({
     noTip: false,
     message: dataTipElement.getAttribute("data-tip") as string,
+    elementInfo: elementInfo
   });
-
   // $TipStore.message = dataTipElement.getAttribute("data-tip") as string;
   const existingOverlay = document.getElementById("data-tip-overlay");
   if (existingOverlay) {
