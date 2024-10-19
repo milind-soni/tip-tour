@@ -6,11 +6,7 @@ Tiptour Selector is a lightweight, customizable tool for creating interactive to
 
 ## Features
 
-- 🚀 Easy to integrate
-- 🎨 Customizable styles
-- 📱 Responsive design
-- 🖱️ Mouse and touch support
-- 🔧 Flexible API
+- 🚀 Easy to integrate with just a snippet
 
 ## Getting Started
 
