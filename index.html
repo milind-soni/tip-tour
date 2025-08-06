@@ -1,109 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-
-    <!-- script -->
-    <script
-      defer
-      src="./dist/tiptour-selector.es.js"
-      data-token="fb2ae7b359f6495f99d66cc11b4b21cb"
-    ></script>
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tooltip</title>
     <style>
-      ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        width: 100%;
-      }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-      ul li {
-        display: flex;
-        justify-content: center;
-      }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-      ul li a {
-        text-decoration: none;
-        color: #000;
-        background-color: #f2f2f2;
-        padding: 4px 8px;
-        border-radius: 4px;
-        width: 100%;
-      }
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            color: white;
+            padding: 40px 20px;
+        }
 
-      ul li a:hover {
-        color: #f00;
-      }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        #tooltip {
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            width: 300px;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+            font-size: 14px;
+            transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
+            will-change: transform;
+        }
+
+        #tooltip.visible {
+            display: block;
+        }
+
+        .tooltip-message {
+            color: #333;
+            margin-bottom: 12px;
+            min-height: 40px;
+            line-height: 1.4;
+        }
+
+        .tooltip-divider {
+            border-top: 1px solid #e0e0e0;
+            margin: 12px 0;
+        }
+
+        .tooltip-input {
+            width: 100%;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+            pointer-events: all;
+        }
+
+        .tooltip-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
     </style>
-  </head>
-  <body>
-    <header
-      style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 64px;
-        background: #f2f2f2;
-        border-bottom: 1px solid #9f9f9f;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 16px;
-      "
-      data-tip="header container 9D43DB60"
-    >
-      <h1>Header</h1>
-    </header>
-
-    <div
-      class="sidebar"
-      style="
-        position: fixed;
-        top: 64px;
-        left: 0;
-        width: 200px;
-        height: calc(100vh - 64px);
-        background: #ffc3c3;
-        border-right: 1px solid #9f9f9f;
-        padding: 16px;
-        overflow-y: auto;
-      "
-      data-tip="sidebar container F2DF010E"
-    >
-      <ul
-        style="
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        "
-        data-tip="sidebar menu"
-      >
-        <li>
-          <a href="#section-1">Section 1</a>
-        </li>
-        <li>
-          <a href="#section-2">Section 2</a>
-        </li>
-        <li>
-          <a href="#section-3">Section 3</a>
-        </li>
-        <li>
-          <a href="#section-4">Section 4</a>
-        </li>
-        <li>
-          <a href="#section-5">Section 5</a>
-        </li>
-      </ul>
+</head>
+<body>
+    <div class="content">
+        <h1>AI Tooltip Demo</h1>
+        <p>Move your mouse around to see the AI tooltip follow your cursor. The tooltip will appear when you hover over text or other elements.</p>
+        <p>Once the tooltip appears, you can immediately start typing to interact with the AI. The tooltip contains a message area and an input field for your queries.</p>
+        <p>Try hovering over different areas and typing questions or commands to see the AI respond in real-time.</p>
+        <p>This is a demonstration of how an AI-powered tooltip can provide contextual assistance while following your mouse movements seamlessly.</p>
     </div>
-  </body>
+
+    <div id="tooltip">
+        <div id="tooltip-message" class="tooltip-message">AI Assistant ready - start typing your question!</div>
+        <div class="tooltip-divider"></div>
+        <input type="text" id="tooltip-input" class="tooltip-input" placeholder="Ask me anything...">
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+</body>
 </html>
