@@ -1,4 +1,4 @@
-# 🎯 AI Tooltip
+# Tip-Tour
 
 A smooth, mouse-following AI tooltip component that provides contextual assistance with real-time interaction capabilities.
 
