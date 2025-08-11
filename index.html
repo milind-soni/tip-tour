@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Tooltip</title>
+    <title>Tip Tour - AI Tooltip Assistant</title>
     <style>
         * {
             margin: 0;
@@ -12,29 +12,149 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
             min-height: 100vh;
-            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
         }
 
-        .content {
-            max-width: 800px;
-            margin: 0 auto;
-            color: white;
-            padding: 40px 20px;
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 20%, rgba(255, 219, 198, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            text-align: center;
+            padding: 60px 20px;
+            max-width: 600px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 24px;
+            animation: float 3s ease-in-out infinite;
         }
 
         h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #111111;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
         }
 
-        p {
-            font-size: 1.2em;
+        .tagline {
+            font-size: 1.25rem;
+            color: #666666;
+            margin-bottom: 48px;
+            font-weight: 400;
             line-height: 1.6;
-            margin-bottom: 20px;
+        }
+
+        .features {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #444444;
+            font-size: 0.95rem;
+        }
+
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .cta {
+            font-size: 1rem;
+            color: #999999;
+            margin-top: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .mouse-icon {
+            width: 20px;
+            height: 30px;
+            border: 2px solid #999999;
+            border-radius: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .mouse-icon::before {
+            content: '';
+            width: 3px;
+            height: 8px;
+            background: #999999;
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            animation: scroll 1.5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes scroll {
+            0% { opacity: 1; top: 5px; }
+            100% { opacity: 0; top: 15px; }
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .tagline {
+                font-size: 1.1rem;
+            }
+            
+            .features {
+                flex-direction: column;
+                gap: 16px;
+                align-items: center;
+            }
         }
 
         #tooltip {
@@ -42,16 +162,20 @@
             top: 0;
             left: 0;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            padding: 16px;
-            width: 300px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08),
+                        0 1px 2px rgba(0, 0, 0, 0.04);
+            padding: 20px;
+            width: 320px;
             pointer-events: none;
             z-index: 1000;
             display: none;
             font-size: 14px;
             transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
             will-change: transform;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
         }
 
         #tooltip.visible {
@@ -59,46 +183,72 @@
         }
 
         .tooltip-message {
-            color: #333;
-            margin-bottom: 12px;
+            color: #333333;
+            margin-bottom: 16px;
             min-height: 40px;
-            line-height: 1.4;
+            line-height: 1.5;
+            font-size: 14px;
         }
 
         .tooltip-divider {
-            border-top: 1px solid #e0e0e0;
-            margin: 12px 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            margin: 16px 0;
         }
 
         .tooltip-input {
             width: 100%;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 8px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 10px;
+            padding: 10px 14px;
             font-size: 14px;
             outline: none;
             font-family: inherit;
             pointer-events: all;
+            background: rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
         }
 
         .tooltip-input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #111111;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .tooltip-input::placeholder {
+            color: #999999;
         }
 
         .loading {
-            color: #666;
-            font-style: italic;
+            color: #999999;
+            font-style: normal;
         }
     </style>
 </head>
 <body>
-    <div class="content">
-        <h1>AI Tooltip Demo</h1>
-        <p>Move your mouse around to see the AI tooltip follow your cursor. The tooltip will appear when you hover over text or other elements.</p>
-        <p>Once the tooltip appears, you can immediately start typing to interact with the AI. The tooltip contains a message area and an input field for your queries.</p>
-        <p>Try hovering over different areas and typing questions or commands to see the AI respond in real-time.</p>
-        <p>This is a demonstration of how an AI-powered tooltip can provide contextual assistance while following your mouse movements seamlessly.</p>
+    <div class="container">
+        <div class="logo">✨</div>
+        <h1>Tip Tour</h1>
+        <p class="tagline">An intelligent tooltip that follows your cursor<br>and responds to your questions instantly</p>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">✓</div>
+                <span>Mouse tracking</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">✓</div>
+                <span>Auto-focus input</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">✓</div>
+                <span>AI powered</span>
+            </div>
+        </div>
+        
+        <div class="cta">
+            <div class="mouse-icon"></div>
+            <span>Move your mouse to begin</span>
+        </div>
     </div>
 
     <div id="tooltip">
