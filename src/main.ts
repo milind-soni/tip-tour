@@ -4,6 +4,8 @@ class AITooltip {
     private tooltip: HTMLElement;
     private tooltipMessage: HTMLElement;
     private tooltipInput: HTMLInputElement;
+    private compass: HTMLElement;
+    private targetButton: HTMLElement;
     private isVisible = false;
     private mouseX = 0;
     private mouseY = 0;
@@ -13,6 +15,8 @@ class AITooltip {
         this.tooltip = document.getElementById('tooltip')!;
         this.tooltipMessage = document.getElementById('tooltip-message')!;
         this.tooltipInput = document.getElementById('tooltip-input') as HTMLInputElement;
+        this.compass = document.getElementById('tooltip-compass')!;
+        this.targetButton = document.getElementById('target-button')!;
         
         this.init();
     }
@@ -21,6 +25,7 @@ class AITooltip {
         this.setupMouseTracking();
         this.setupKeyboardHandling();
         this.setupInputHandling();
+        this.setupTargetButton();
     }
 
     private setupMouseTracking() {
@@ -40,6 +45,7 @@ class AITooltip {
                 isUpdating = true;
                 animationFrameId = requestAnimationFrame(() => {
                     this.updateTooltipPosition();
+                    this.updateCompass();
                     isUpdating = false;
                 });
             }
@@ -143,6 +149,7 @@ class AITooltip {
         if (!this.isVisible) {
             this.isVisible = true;
             this.tooltip.classList.add('visible');
+            this.updateCompass(); // Update compass when tooltip becomes visible
             
             setTimeout(() => {
                 if (this.isVisible && document.activeElement !== this.tooltipInput) {
@@ -191,6 +198,57 @@ class AITooltip {
 
         // Use transform for best performance
         this.tooltip.style.transform = `translate(${left}px, ${top}px)`;
+    }
+    
+    private setupTargetButton() {
+        this.targetButton.addEventListener('click', () => {
+            // Fun interaction when button is clicked
+            this.targetButton.textContent = '🎉 You found me! Nice navigation!';
+            this.targetButton.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+            
+            setTimeout(() => {
+                this.targetButton.textContent = '🎯 Find me if you can!';
+                this.targetButton.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }, 3000);
+        });
+    }
+    
+    private updateCompass() {
+        if (!this.isVisible) return;
+        
+        // Get tooltip center position
+        const tooltipRect = this.tooltip.getBoundingClientRect();
+        const tooltipCenterX = tooltipRect.left + tooltipRect.width / 2;
+        const tooltipCenterY = tooltipRect.top + tooltipRect.height / 2;
+        
+        // Get target button center position
+        const buttonRect = this.targetButton.getBoundingClientRect();
+        const buttonCenterX = buttonRect.left + buttonRect.width / 2;
+        const buttonCenterY = buttonRect.top + buttonRect.height / 2;
+        
+        // Calculate angle and distance
+        const deltaX = buttonCenterX - tooltipCenterX;
+        const deltaY = buttonCenterY - tooltipCenterY;
+        const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        // Rotate compass arrow (subtract 90 degrees since arrow points up by default)
+        const compassArrow = this.compass.querySelector('.compass-arrow') as HTMLElement;
+        if (compassArrow) {
+            compassArrow.style.transform = `rotate(${angle + 90}deg)`;
+            
+            // Scale based on distance - closer = bigger
+            if (distance < 150) {
+                // Very close - scale up
+                compassArrow.style.transform = `rotate(${angle + 90}deg) scale(1.2)`;
+            } else if (distance < 300) {
+                // Medium distance
+                compassArrow.style.transform = `rotate(${angle + 90}deg) scale(1.1)`;
+            } else {
+                // Far away - normal size
+                compassArrow.style.transform = `rotate(${angle + 90}deg) scale(1)`;
+            }
+        }
     }
 }
 

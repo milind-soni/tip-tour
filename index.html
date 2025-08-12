@@ -221,6 +221,51 @@
             color: #999999;
             font-style: normal;
         }
+        
+        .tooltip-compass {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .compass-arrow {
+            transform-origin: center;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
+        }
+        
+        .target-button {
+            position: fixed;
+            top: 30%;
+            left: 15%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            z-index: 100;
+            font-family: inherit;
+        }
+        
+        .target-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .target-button:active {
+            transform: translateY(0px);
+        }
     </style>
 </head>
 <body>
@@ -249,8 +294,26 @@
             <span>Move your mouse to begin</span>
         </div>
     </div>
+    
+    <button id="target-button" class="target-button">🎯 Find me if you can!</button>
 
     <div id="tooltip">
+        <div class="tooltip-compass" id="tooltip-compass">
+            <div class="compass-arrow">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Classic compass needle shape -->
+                    <g>
+                        <!-- North arrow (pointer) - pastel coral red -->
+                        <path d="M20 8 L24 20 L20 18 L16 20 Z" fill="#ff8787" stroke="#ff8787" stroke-width="0.5"/>
+                        <!-- South arrow (tail) - light gray -->
+                        <path d="M20 32 L16 20 L20 22 L24 20 Z" fill="#d4d4d4" stroke="#d4d4d4" stroke-width="0.5"/>
+                        <!-- Center circle -->
+                        <circle cx="20" cy="20" r="3" fill="#ffffff" stroke="#ff8787" stroke-width="1.5"/>
+                        <circle cx="20" cy="20" r="1" fill="#ff8787"/>
+                    </g>
+                </svg>
+            </div>
+        </div>
         <div id="tooltip-message" class="tooltip-message">AI Assistant ready - start typing your question!</div>
         <div class="tooltip-divider"></div>
         <input type="text" id="tooltip-input" class="tooltip-input" placeholder="Ask me anything...">
