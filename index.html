@@ -172,9 +172,8 @@
             z-index: 1000;
             display: none;
             font-size: 14px;
-            transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
-            will-change: transform;
-            backdrop-filter: blur(10px);
+            transform: translateZ(0); /* Force layer creation for better performance */
+            backface-visibility: hidden; /* Prevent flickering */
             background: rgba(255, 255, 255, 0.98);
         }
 

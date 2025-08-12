@@ -1,3 +1,5 @@
+import { callOpenAI } from './api';
+
 class AITooltip {
     private tooltip: HTMLElement;
     private tooltipMessage: HTMLElement;
@@ -5,6 +7,7 @@ class AITooltip {
     private isVisible = false;
     private mouseX = 0;
     private mouseY = 0;
+    private hideTimeout: ReturnType<typeof setTimeout> | null = null;
 
     constructor() {
         this.tooltip = document.getElementById('tooltip')!;
@@ -21,24 +24,33 @@ class AITooltip {
     }
 
     private setupMouseTracking() {
-        let mouseMoveTimeout: number;
+        let mouseMoveTimeout: ReturnType<typeof setTimeout>;
         let animationFrameId: number;
+        let isUpdating = false;
 
         document.addEventListener('mousemove', (e) => {
             this.mouseX = e.clientX;
             this.mouseY = e.clientY;
             
+            // Show tooltip immediately on mouse move
             this.showTooltip();
             
-            cancelAnimationFrame(animationFrameId);
-            animationFrameId = requestAnimationFrame(() => {
-                this.updateTooltipPosition();
-            });
+            // Use RAF for smooth position updates without throttling
+            if (!isUpdating) {
+                isUpdating = true;
+                animationFrameId = requestAnimationFrame(() => {
+                    this.updateTooltipPosition();
+                    isUpdating = false;
+                });
+            }
 
             clearTimeout(mouseMoveTimeout);
-            mouseMoveTimeout = setTimeout(() => {
-                this.hideTooltip();
-            }, 2000);
+            // Don't set hide timer if input is focused or has content
+            if (document.activeElement !== this.tooltipInput && !this.tooltipInput.value.trim()) {
+                mouseMoveTimeout = setTimeout(() => {
+                    this.hideTooltip();
+                }, 5000); // 5 seconds timeout
+            }
         });
     }
 
@@ -71,18 +83,52 @@ class AITooltip {
         });
 
         this.tooltipInput.addEventListener('input', () => {
-            if (this.tooltipInput.value.trim()) {
-                this.showTooltip();
+            // Clear any hide timeout while typing
+            if (this.hideTimeout) {
+                clearTimeout(this.hideTimeout);
+                this.hideTimeout = null;
+            }
+            this.showTooltip();
+        });
+        
+        // Keep tooltip visible when input is focused
+        this.tooltipInput.addEventListener('focus', () => {
+            if (this.hideTimeout) {
+                clearTimeout(this.hideTimeout);
+                this.hideTimeout = null;
+            }
+            this.showTooltip();
+        });
+        
+        // Only allow hiding when input loses focus AND is empty
+        this.tooltipInput.addEventListener('blur', () => {
+            if (!this.tooltipInput.value.trim()) {
+                this.hideTimeout = setTimeout(() => {
+                    this.hideTooltip();
+                }, 3000);
             }
         });
     }
 
     private async handleUserInput(input: string) {
+        // Show loading immediately
         this.tooltipMessage.innerHTML = '<div class="loading">Processing your request...</div>';
+        
+        // Keep tooltip visible during API call
+        this.showTooltip();
         
         try {
             const response = await this.callAI(input);
             this.tooltipMessage.textContent = response;
+            // Keep tooltip visible after response for at least 10 seconds for reading
+            this.showTooltip();
+            
+            // Extend visibility for reading the response
+            setTimeout(() => {
+                if (this.isVisible && document.activeElement !== this.tooltipInput) {
+                    // Allow natural hide after reading time
+                }
+            }, 10000);
         } catch (error) {
             this.tooltipMessage.textContent = 'Sorry, I encountered an error. Please try again.';
             console.error('AI API Error:', error);
@@ -90,16 +136,7 @@ class AITooltip {
     }
 
     private async callAI(prompt: string): Promise<string> {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const responses = [
-            `I understand you asked about "${prompt}". This is a demo response from the AI assistant.`,
-            `Great question about "${prompt}"! In a real implementation, this would connect to an actual AI API.`,
-            `Regarding "${prompt}" - this tooltip demonstrates how AI can provide contextual assistance while following your mouse.`,
-            `You mentioned "${prompt}". This AI tooltip can be integrated with any language model API for real responses.`
-        ];
-        
-        return responses[Math.floor(Math.random() * responses.length)];
+        return await callOpenAI(prompt);
     }
 
     private showTooltip() {
@@ -116,6 +153,11 @@ class AITooltip {
     }
 
     private hideTooltip() {
+        // Don't hide if input is focused or has content
+        if (document.activeElement === this.tooltipInput || this.tooltipInput.value.trim()) {
+            return;
+        }
+        
         if (this.isVisible) {
             this.isVisible = false;
             this.tooltip.classList.remove('visible');
@@ -126,22 +168,28 @@ class AITooltip {
 
     private updateTooltipPosition() {
         const offset = 20;
-        const tooltipRect = this.tooltip.getBoundingClientRect();
+        // Cache dimensions to avoid reflow
+        const tooltipWidth = this.tooltip.offsetWidth;
+        const tooltipHeight = this.tooltip.offsetHeight;
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
         
         let left = this.mouseX + offset;
         let top = this.mouseY + offset;
 
-        if (left + tooltipRect.width > window.innerWidth) {
-            left = this.mouseX - tooltipRect.width - offset;
+        // Smart positioning to avoid edges
+        if (left + tooltipWidth > windowWidth) {
+            left = this.mouseX - tooltipWidth - offset;
         }
         
-        if (top + tooltipRect.height > window.innerHeight) {
-            top = this.mouseY - tooltipRect.height - offset;
+        if (top + tooltipHeight > windowHeight) {
+            top = this.mouseY - tooltipHeight - offset;
         }
 
         left = Math.max(10, left);
         top = Math.max(10, top);
 
+        // Use transform for best performance
         this.tooltip.style.transform = `translate(${left}px, ${top}px)`;
     }
 }
