@@ -1,6 +1,6 @@
 # Tip-Tour
 
-A smooth, mouse-following AI tooltip component that provides contextual assistance with real-time interaction capabilities.
+An interactive AI-powered tooltip that follows your cursor with dynamic navigation features and playful hand-drawn UI elements.
 
 ![Demo](https://img.shields.io/badge/Demo-Live-brightgreen?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
@@ -10,15 +10,24 @@ A smooth, mouse-following AI tooltip component that provides contextual assistan
 
 - 🖱️ **Smooth Mouse Tracking** - Tooltip follows cursor with buttery smooth animations
 - ⚡ **Auto-Focus Input** - Start typing anywhere to instantly interact with AI
-- 🎨 **Modern UI Design** - Clean, responsive design with beautiful gradients
+- 🎯 **Dynamic Arrow Navigation** - V-shaped arrow that points to interactive elements
+- 🎨 **Hand-Drawn UI Elements** - Excalidraw-inspired sketchy button design
+- 🟢 **Interactive Visual Feedback** - Arrow changes color and size based on proximity
+- 🎮 **Gamified Navigation** - Two-button chase game with visual celebrations
 - 🚀 **Hardware Accelerated** - Uses CSS transforms for optimal performance
-- 🤖 **AI Ready** - Built-in integration points for any AI API
+- 🤖 **OpenAI Integration** - Built-in GPT-4o-mini support with response caching
 - 📱 **Smart Positioning** - Prevents tooltip from going off-screen
 - ⌨️ **Keyboard Friendly** - Full keyboard navigation support
 
 ## 🎥 Demo
 
-Move your mouse around to see the tooltip in action. The tooltip appears on mouse movement and you can immediately start typing to interact with the AI assistant.
+Experience the interactive tooltip with dynamic arrow navigation:
+- Move your mouse to see the tooltip follow you
+- Watch the V-shaped arrow point to interactive buttons
+- Click buttons to see the arrow switch targets
+- Arrow grows larger as you approach targets
+- Arrow turns green when hovering over the target button
+- Type anywhere to instantly interact with the AI assistant
 
 ## 🚀 Quick Start
 
@@ -40,27 +49,45 @@ Move your mouse around to see the tooltip in action. The tooltip appears on mous
    npm install
    ```
 
-3. **Start development server**
+3. **Configure OpenAI API (Optional)**
+   Create a `.env.local` file in the root directory:
+   ```env
+   VITE_OPENAI_API_KEY=your-openai-api-key
+   ```
+
+4. **Start development server**
    ```bash
    npm run dev
    ```
 
-4. **Open your browser**
+5. **Open your browser**
    ```
-   http://localhost:3000
+   http://localhost:3001
    ```
 
 ## 🎮 Usage
 
-### Basic Implementation
+### Interactive Features
 
-The tooltip automatically initializes when the page loads. Here's how it works:
+The tooltip automatically initializes when the page loads:
 
-- **Mouse Movement**: Tooltip appears and follows your cursor
-- **Auto-Hide**: Disappears after 2 seconds of inactivity  
+**Tooltip Behavior:**
+- **Mouse Movement**: Tooltip appears and follows your cursor smoothly
+- **Auto-Hide**: Disappears after 5 seconds of inactivity  
 - **Typing**: Start typing anywhere to focus the input
 - **Send Message**: Press `Enter` to send your message to AI
 - **Escape**: Press `Esc` to hide the tooltip
+
+**Arrow Navigation:**
+- **Dynamic Pointing**: V-shaped arrow always points to the active target button
+- **Proximity Scaling**: Arrow grows larger as you approach the target (1x to 1.4x scale)
+- **Hover Feedback**: Arrow turns green and scales to 1.5x when hovering over target
+- **Click Response**: Arrow immediately points to the next button after clicking
+
+**Button Interaction:**
+- **Hand-Drawn Style**: Buttons have sketchy borders inspired by Excalidraw
+- **Click Feedback**: Visual celebration when buttons are clicked
+- **Sequential Flow**: "Click me!" → "Then me!" creates a playful navigation loop
 
 ### Customization
 
@@ -78,20 +105,17 @@ Modify the CSS variables in `index.html`:
 
 #### AI Integration
 
-Replace the mock AI function in `src/main.ts`:
+The project uses OpenAI's GPT-4o-mini model. Configure in `src/api.ts`:
 
 ```typescript
-private async callAI(prompt: string): Promise<string> {
-    // Replace with your AI API call
-    const response = await fetch('/api/your-ai-endpoint', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-    });
-    
-    const data = await response.json();
-    return data.response;
-}
+// Set your API key in .env.local
+VITE_OPENAI_API_KEY=your-api-key
+
+// The system includes:
+- Response caching (5-minute TTL)
+- Rate limit handling
+- Fallback responses when API is unavailable
+- Max 150 tokens per response for quick interactions
 ```
 
 #### Positioning & Timing
@@ -173,7 +197,8 @@ npm run watch
 ```
 tiptour/
 ├── src/
-│   └── main.ts          # Main tooltip logic
+│   ├── main.ts          # Main tooltip & navigation logic
+│   └── api.ts           # OpenAI integration & caching
 ├── index.html           # Demo page with styles
 ├── package.json         # Dependencies
 ├── vite.config.js       # Vite configuration

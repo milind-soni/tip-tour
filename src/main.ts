@@ -4,8 +4,11 @@ class AITooltip {
     private tooltip: HTMLElement;
     private tooltipMessage: HTMLElement;
     private tooltipInput: HTMLInputElement;
-    private compass: HTMLElement;
-    private targetButton: HTMLElement;
+    private arrow: HTMLElement;
+    private buttonOne: HTMLElement;
+    private buttonTwo: HTMLElement;
+    private currentTarget: HTMLElement | null = null;
+    private isHoveringTarget = false;
     private isVisible = false;
     private mouseX = 0;
     private mouseY = 0;
@@ -15,8 +18,9 @@ class AITooltip {
         this.tooltip = document.getElementById('tooltip')!;
         this.tooltipMessage = document.getElementById('tooltip-message')!;
         this.tooltipInput = document.getElementById('tooltip-input') as HTMLInputElement;
-        this.compass = document.getElementById('tooltip-compass')!;
-        this.targetButton = document.getElementById('target-button')!;
+        this.arrow = document.getElementById('tooltip-arrow')!;
+        this.buttonOne = document.getElementById('button-one')!;
+        this.buttonTwo = document.getElementById('button-two')!;
         
         this.init();
     }
@@ -25,7 +29,7 @@ class AITooltip {
         this.setupMouseTracking();
         this.setupKeyboardHandling();
         this.setupInputHandling();
-        this.setupTargetButton();
+        this.setupButtons();
     }
 
     private setupMouseTracking() {
@@ -45,7 +49,7 @@ class AITooltip {
                 isUpdating = true;
                 animationFrameId = requestAnimationFrame(() => {
                     this.updateTooltipPosition();
-                    this.updateCompass();
+                    this.updateArrow();
                     isUpdating = false;
                 });
             }
@@ -149,7 +153,7 @@ class AITooltip {
         if (!this.isVisible) {
             this.isVisible = true;
             this.tooltip.classList.add('visible');
-            this.updateCompass(); // Update compass when tooltip becomes visible
+            this.updateArrow(); // Update arrow when tooltip becomes visible
             
             setTimeout(() => {
                 if (this.isVisible && document.activeElement !== this.tooltipInput) {
@@ -200,29 +204,78 @@ class AITooltip {
         this.tooltip.style.transform = `translate(${left}px, ${top}px)`;
     }
     
-    private setupTargetButton() {
-        this.targetButton.addEventListener('click', () => {
-            // Fun interaction when button is clicked
-            this.targetButton.textContent = '🎉 You found me! Nice navigation!';
-            this.targetButton.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+    private setupButtons() {
+        this.buttonOne.addEventListener('click', () => {
+            this.buttonOne.textContent = '🎉 Found me!';
+            this.buttonOne.style.background = '#e8f5e9';
+            // Reset hover state and point arrow to button two
+            this.isHoveringTarget = false;
+            this.currentTarget = this.buttonTwo;
+            this.updateArrow();
             
             setTimeout(() => {
-                this.targetButton.textContent = '🎯 Find me if you can!';
-                this.targetButton.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            }, 3000);
+                this.buttonOne.textContent = '📍 Click me!';
+                this.buttonOne.style.background = '#ffffff';
+            }, 2000);
         });
+        
+        this.buttonTwo.addEventListener('click', () => {
+            this.buttonTwo.textContent = '🎆 Sparkles!';
+            this.buttonTwo.style.background = '#fff3e0';
+            // Reset hover state and point arrow to button one
+            this.isHoveringTarget = false;
+            this.currentTarget = this.buttonOne;
+            this.updateArrow();
+            
+            setTimeout(() => {
+                this.buttonTwo.textContent = '✨ Then me!';
+                this.buttonTwo.style.background = '#ffffff';
+            }, 2000);
+        });
+        
+        // Add hover detection for both buttons
+        this.buttonOne.addEventListener('mouseenter', () => {
+            if (this.currentTarget === this.buttonOne) {
+                this.isHoveringTarget = true;
+                this.updateArrow();
+            }
+        });
+        
+        this.buttonOne.addEventListener('mouseleave', () => {
+            if (this.currentTarget === this.buttonOne) {
+                this.isHoveringTarget = false;
+                this.updateArrow();
+            }
+        });
+        
+        this.buttonTwo.addEventListener('mouseenter', () => {
+            if (this.currentTarget === this.buttonTwo) {
+                this.isHoveringTarget = true;
+                this.updateArrow();
+            }
+        });
+        
+        this.buttonTwo.addEventListener('mouseleave', () => {
+            if (this.currentTarget === this.buttonTwo) {
+                this.isHoveringTarget = false;
+                this.updateArrow();
+            }
+        });
+        
+        // Set initial target to button one
+        this.currentTarget = this.buttonOne;
     }
     
-    private updateCompass() {
-        if (!this.isVisible) return;
+    private updateArrow() {
+        if (!this.isVisible || !this.currentTarget) return;
         
         // Get tooltip center position
         const tooltipRect = this.tooltip.getBoundingClientRect();
         const tooltipCenterX = tooltipRect.left + tooltipRect.width / 2;
         const tooltipCenterY = tooltipRect.top + tooltipRect.height / 2;
         
-        // Get target button center position
-        const buttonRect = this.targetButton.getBoundingClientRect();
+        // Get current target button center position
+        const buttonRect = this.currentTarget.getBoundingClientRect();
         const buttonCenterX = buttonRect.left + buttonRect.width / 2;
         const buttonCenterY = buttonRect.top + buttonRect.height / 2;
         
@@ -232,22 +285,33 @@ class AITooltip {
         const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         
-        // Rotate compass arrow (subtract 90 degrees since arrow points up by default)
-        const compassArrow = this.compass.querySelector('.compass-arrow') as HTMLElement;
-        if (compassArrow) {
-            compassArrow.style.transform = `rotate(${angle + 90}deg)`;
-            
-            // Scale based on distance - closer = bigger
-            if (distance < 150) {
-                // Very close - scale up
-                compassArrow.style.transform = `rotate(${angle + 90}deg) scale(1.2)`;
-            } else if (distance < 300) {
-                // Medium distance
-                compassArrow.style.transform = `rotate(${angle + 90}deg) scale(1.1)`;
+        // Rotate V arrow (arrow points right by default at 0 degrees)
+        const vArrow = this.arrow.querySelector('.v-arrow') as HTMLElement;
+        const arrowPath = this.arrow.querySelector('.arrow-path') as SVGPathElement;
+        
+        if (vArrow && arrowPath) {
+            // Enhanced scaling - more dramatic as you get closer
+            let scale = 1;
+            if (this.isHoveringTarget) {
+                scale = 1.5; // Big when hovering
+                arrowPath.setAttribute('stroke', '#10b981'); // Green when hovering
             } else {
-                // Far away - normal size
-                compassArrow.style.transform = `rotate(${angle + 90}deg) scale(1)`;
+                // Progressive scaling based on distance
+                if (distance < 50) {
+                    scale = 1.4;
+                } else if (distance < 100) {
+                    scale = 1.3;
+                } else if (distance < 150) {
+                    scale = 1.2;
+                } else if (distance < 250) {
+                    scale = 1.1;
+                } else if (distance < 350) {
+                    scale = 1.05;
+                }
+                arrowPath.setAttribute('stroke', '#1a1a1a'); // Black when not hovering
             }
+            
+            vArrow.style.transform = `rotate(${angle}deg) scale(${scale})`;
         }
     }
 }

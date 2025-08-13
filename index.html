@@ -222,49 +222,76 @@
             font-style: normal;
         }
         
-        .tooltip-compass {
+        .tooltip-arrow {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 40px;
-            height: 40px;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
         }
         
-        .compass-arrow {
+        .v-arrow {
             transform-origin: center;
             transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
         }
         
-        .target-button {
+        .arrow-path {
+            transition: stroke 0.2s ease;
+        }
+        
+        .hand-drawn-button {
             position: fixed;
-            top: 30%;
-            left: 15%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
+            background: #ffffff;
+            color: #1a1a1a;
+            border: 2px solid #1a1a1a;
+            padding: 10px 20px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             z-index: 100;
-            font-family: inherit;
+            font-family: 'Comic Sans MS', 'Segoe UI', system-ui, sans-serif;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
         }
         
-        .target-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        .hand-drawn-button::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border: 2px solid transparent;
+            border-radius: inherit;
+            background: transparent;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
         
-        .target-button:active {
-            transform: translateY(0px);
+        .hand-drawn-button:hover {
+            transform: rotate(-1deg) translateY(-2px);
+            box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.15);
+            background: #f8f8f8;
+        }
+        
+        .hand-drawn-button:active {
+            transform: rotate(0deg) translateY(0px);
+            box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+        }
+        
+        #button-one {
+            top: 120px;
+            right: 280px;
+            transform: rotate(-2deg);
+        }
+        
+        #button-two {
+            bottom: 240px;
+            left: 120px;
+            transform: rotate(1deg);
+            border-radius: 15px 225px 15px 255px/225px 15px 255px 15px;
         }
     </style>
 </head>
@@ -295,22 +322,15 @@
         </div>
     </div>
     
-    <button id="target-button" class="target-button">🎯 Find me if you can!</button>
+    <button id="button-one" class="hand-drawn-button">📍 Click me!</button>
+    <button id="button-two" class="hand-drawn-button">✨ Then me!</button>
 
     <div id="tooltip">
-        <div class="tooltip-compass" id="tooltip-compass">
-            <div class="compass-arrow">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Classic compass needle shape -->
-                    <g>
-                        <!-- North arrow (pointer) - pastel coral red -->
-                        <path d="M20 8 L24 20 L20 18 L16 20 Z" fill="#ff8787" stroke="#ff8787" stroke-width="0.5"/>
-                        <!-- South arrow (tail) - light gray -->
-                        <path d="M20 32 L16 20 L20 22 L24 20 Z" fill="#d4d4d4" stroke="#d4d4d4" stroke-width="0.5"/>
-                        <!-- Center circle -->
-                        <circle cx="20" cy="20" r="3" fill="#ffffff" stroke="#ff8787" stroke-width="1.5"/>
-                        <circle cx="20" cy="20" r="1" fill="#ff8787"/>
-                    </g>
+        <div class="tooltip-arrow" id="tooltip-arrow">
+            <div class="v-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- V-shaped arrow pointing right by default -->
+                    <path class="arrow-path" d="M8 4 L16 12 L8 20" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                 </svg>
             </div>
         </div>
