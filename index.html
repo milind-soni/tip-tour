@@ -293,6 +293,27 @@
             transform: rotate(1deg);
             border-radius: 15px 225px 15px 255px/225px 15px 255px 15px;
         }
+        
+        #button-three {
+            top: 200px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-1deg);
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+        }
+        
+        #button-four {
+            top: 50%;
+            right: 100px;
+            transform: translateY(-50%) rotate(2deg);
+            border-radius: 15px 255px 15px 225px/255px 15px 225px 15px;
+        }
+        
+        #button-five {
+            bottom: 120px;
+            right: 200px;
+            transform: rotate(-1deg);
+            border-radius: 225px 15px 255px 15px/15px 255px 15px 225px;
+        }
     </style>
 </head>
 <body>
@@ -322,8 +343,11 @@
         </div>
     </div>
     
-    <button id="button-one" class="hand-drawn-button">📍 Click me!</button>
-    <button id="button-two" class="hand-drawn-button">✨ Then me!</button>
+    <button id="button-one" class="hand-drawn-button">Button 1</button>
+    <button id="button-two" class="hand-drawn-button">Button 2</button>
+    <button id="button-three" class="hand-drawn-button">Button 3</button>
+    <button id="button-four" class="hand-drawn-button">Button 4</button>
+    <button id="button-five" class="hand-drawn-button">Button 5</button>
 
     <div id="tooltip">
         <div class="tooltip-arrow" id="tooltip-arrow">
@@ -334,7 +358,7 @@
                 </svg>
             </div>
         </div>
-        <div id="tooltip-message" class="tooltip-message">AI Assistant ready - start typing your question!</div>
+        <div id="tooltip-message" class="tooltip-message">AI Assistant ready - try "bake a cake" or "make pizza"!</div>
         <div class="tooltip-divider"></div>
         <input type="text" id="tooltip-input" class="tooltip-input" placeholder="Ask me anything...">
     </div>

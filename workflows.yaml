@@ -1,0 +1,66 @@
+workflows:
+  - id: "cake"
+    name: "Bake a Magical Rainbow Cake"
+    description: "Create the most epic rainbow cake that will make unicorns jealous! 🦄🌈"
+    context: "You are a quirky, enthusiastic baking assistant with a sense of humor. Make baking sound magical and fun! Use lots of emojis and be encouraging."
+    steps:
+      - button: 3
+        action: "Mix the Magic Flour"
+        description: "Time to create our magical flour mixture! Whisk it like you're casting a spell! ✨"
+        tips: ["Don't over-mix or the cake gods will be angry!", "Sing while you mix - it adds extra flavor!", "If flour gets everywhere, you're doing it right!"]
+      - button: 1
+        action: "Add Rainbow Colors"
+        description: "Now for the fun part - add ALL the colors! Red, blue, green, yellow... go wild! 🎨"
+        tips: ["The more colors, the more magical!", "Food coloring on fingers = badge of honor", "Each color represents a different superpower!"]
+      - button: 5
+        action: "Pour into Mystical Pans"
+        description: "Carefully pour your rainbow batter into the chosen pans. They're not just pans - they're portals to cake heaven! 🍰"
+        tips: ["Talk to your pans, they like encouragement", "Gentle pouring = happy cake", "If you spill, the kitchen spirits are just excited!"]
+      - button: 2
+        action: "Bake with Love Energy"
+        description: "Into the oven it goes! Send it good vibes while it bakes. Maybe do a little cake dance? 💃"
+        tips: ["Dance while it bakes for extra fluffiness", "Don't peek too much - cakes are shy!", "The smell means it's working its magic!"]
+        
+  - id: "superhero"
+    name: "Become a Superhero (Office Edition)"
+    description: "Transform from boring office human into CAPTAIN PRODUCTIVITY! 🦸‍♀️⚡"
+    context: "You are a superhero mentor with a great sense of humor. Everything should sound epic and over-the-top, but about mundane office tasks."
+    steps:
+      - button: 2
+        action: "Don the Cape of Confidence"
+        description: "First, you must put on your invisible cape! Feel it flowing majestically as you prepare for battle against procrastination! 🦸‍♂️"
+        tips: ["Capes make everything 47% more awesome", "Striking a pose is mandatory", "The cape is invisible but very real!"]
+      - button: 4
+        action: "Activate Coffee Powers"
+        description: "Every superhero needs their power source! Activate your caffeine-based superpowers! ☕️⚡"
+        tips: ["The stronger the coffee, the stronger you become", "Make superhero sound effects while drinking", "Decaf is kryptonite - avoid at all costs!"]
+      - button: 1
+        action: "Organize the Fortress of Solitude"
+        description: "Clean your desk/workspace! A true superhero's lair must be ready for action! 🏢✨"
+        tips: ["Every superhero has a clean base", "Throw away old sticky notes dramatically", "Your stapler is now your sidekick!"]
+      - button: 3
+        action: "Save the Day (Do Your Tasks)"
+        description: "Now go forth and conquer your to-do list like the productivity superhero you are! 📝🏆"
+        tips: ["Each completed task saves the world", "Victory poses after each task are required", "You're not just working, you're HEROICALLY ACHIEVING!"]
+        
+  - id: "pizza"
+    name: "Create the Ultimate Pizza Masterpiece"
+    description: "Build a pizza so amazing that even the Italians will cry tears of joy! 🍕😭"
+    context: "You are a passionate pizza chef who takes pizza VERY seriously but is also completely ridiculous. Everything about pizza is life or death dramatic."
+    steps:
+      - button: 1
+        action: "Awaken the Ancient Dough"
+        description: "The dough has been sleeping... it's time to wake it up with gentle kneading! This is a sacred ritual! 🙏"
+        tips: ["Whisper sweet nothings to your dough", "If it's not sticky enough, you need more flour!", "The dough should feel like a cloud made of dreams"]
+      - button: 4
+        action: "Spread the Sacred Sauce"
+        description: "Apply the tomato sauce with the precision of a Renaissance painter! Too much = soggy disaster, too little = sadness! 🎨🍅"
+        tips: ["Leave a little border - crust is important!", "Swirl patterns unlock flavor secrets", "The sauce must be distributed with LOVE"]
+      - button: 5
+        action: "Deploy the Cheese Artillery"
+        description: "Release the cheese! Mozzarella, parmesan, maybe some cheddar if you're feeling rebellious! 🧀💥"
+        tips: ["More cheese = more happiness (this is science)", "Different cheeses create flavor explosions", "If you can still see sauce, add more cheese!"]
+      - button: 3
+        action: "Launch into the Fire Portal"
+        description: "Send your masterpiece into the blazing oven portal! Watch through the glass like a proud parent! 🔥👨‍🍳"
+        tips: ["The oven is a portal to pizza paradise", "Check it obsessively - this is normal", "When the cheese bubbles, angels sing!"]

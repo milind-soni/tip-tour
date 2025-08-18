@@ -1,4 +1,5 @@
-import { callOpenAI } from './api';
+import { callLMStudio } from './lmstudio';
+import { SimpleWorkflowManager } from './simpleWorkflow';
 
 class AITooltip {
     private tooltip: HTMLElement;
@@ -7,6 +8,10 @@ class AITooltip {
     private arrow: HTMLElement;
     private buttonOne: HTMLElement;
     private buttonTwo: HTMLElement;
+    private buttonThree: HTMLElement;
+    private buttonFour: HTMLElement;
+    private buttonFive: HTMLElement;
+    private workflowManager: SimpleWorkflowManager;
     private currentTarget: HTMLElement | null = null;
     private isHoveringTarget = false;
     private isVisible = false;
@@ -21,7 +26,12 @@ class AITooltip {
         this.arrow = document.getElementById('tooltip-arrow')!;
         this.buttonOne = document.getElementById('button-one')!;
         this.buttonTwo = document.getElementById('button-two')!;
+        this.buttonThree = document.getElementById('button-three')!;
+        this.buttonFour = document.getElementById('button-four')!;
+        this.buttonFive = document.getElementById('button-five')!;
         
+        this.workflowManager = new SimpleWorkflowManager();
+        this.workflowManager.setTooltipReference(this);
         this.init();
     }
 
@@ -146,7 +156,7 @@ class AITooltip {
     }
 
     private async callAI(prompt: string): Promise<string> {
-        return await callOpenAI(prompt);
+        return await this.workflowManager.handleCommand(prompt);
     }
 
     private showTooltip() {
@@ -173,7 +183,7 @@ class AITooltip {
             this.isVisible = false;
             this.tooltip.classList.remove('visible');
             this.tooltipInput.blur();
-            this.tooltipMessage.textContent = 'AI Assistant ready - start typing your question!';
+            this.tooltipMessage.textContent = 'AI Assistant ready - try "bake a cake" or "make pizza"!';
         }
     }
 
@@ -205,61 +215,41 @@ class AITooltip {
     }
     
     private setupButtons() {
-        this.buttonOne.addEventListener('click', () => {
-            this.buttonOne.textContent = '🎉 Found me!';
-            this.buttonOne.style.background = '#e8f5e9';
-            // Reset hover state and point arrow to button two
-            this.isHoveringTarget = false;
-            this.currentTarget = this.buttonTwo;
-            this.updateArrow();
+        const buttons = [this.buttonOne, this.buttonTwo, this.buttonThree, this.buttonFour, this.buttonFive];
+        
+        buttons.forEach((button, index) => {
+            const buttonNum = index + 1;
             
-            setTimeout(() => {
-                this.buttonOne.textContent = '📍 Click me!';
-                this.buttonOne.style.background = '#ffffff';
-            }, 2000);
-        });
-        
-        this.buttonTwo.addEventListener('click', () => {
-            this.buttonTwo.textContent = '🎆 Sparkles!';
-            this.buttonTwo.style.background = '#fff3e0';
-            // Reset hover state and point arrow to button one
-            this.isHoveringTarget = false;
-            this.currentTarget = this.buttonOne;
-            this.updateArrow();
+            button.addEventListener('click', async () => {
+                button.textContent = `✓ Button ${buttonNum}`;
+                button.style.background = '#e8f5e9';
+                
+                // If in workflow and this is the target button, auto-advance
+                if (this.workflowManager.isWorkflowActive() && this.currentTarget === button) {
+                    const result = this.workflowManager.autoAdvance();
+                    this.tooltipMessage.textContent = result;
+                }
+                
+                setTimeout(() => {
+                    button.textContent = `Button ${buttonNum}`;
+                    button.style.background = '#ffffff';
+                }, 2000);
+            });
             
-            setTimeout(() => {
-                this.buttonTwo.textContent = '✨ Then me!';
-                this.buttonTwo.style.background = '#ffffff';
-            }, 2000);
-        });
-        
-        // Add hover detection for both buttons
-        this.buttonOne.addEventListener('mouseenter', () => {
-            if (this.currentTarget === this.buttonOne) {
-                this.isHoveringTarget = true;
-                this.updateArrow();
-            }
-        });
-        
-        this.buttonOne.addEventListener('mouseleave', () => {
-            if (this.currentTarget === this.buttonOne) {
-                this.isHoveringTarget = false;
-                this.updateArrow();
-            }
-        });
-        
-        this.buttonTwo.addEventListener('mouseenter', () => {
-            if (this.currentTarget === this.buttonTwo) {
-                this.isHoveringTarget = true;
-                this.updateArrow();
-            }
-        });
-        
-        this.buttonTwo.addEventListener('mouseleave', () => {
-            if (this.currentTarget === this.buttonTwo) {
-                this.isHoveringTarget = false;
-                this.updateArrow();
-            }
+            // Add hover detection
+            button.addEventListener('mouseenter', () => {
+                if (this.currentTarget === button) {
+                    this.isHoveringTarget = true;
+                    this.updateArrow();
+                }
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                if (this.currentTarget === button) {
+                    this.isHoveringTarget = false;
+                    this.updateArrow();
+                }
+            });
         });
         
         // Set initial target to button one
@@ -313,6 +303,12 @@ class AITooltip {
             
             vArrow.style.transform = `rotate(${angle}deg) scale(${scale})`;
         }
+    }
+    
+    // Public method for workflow manager to control arrow pointing
+    public setCurrentTarget(target: HTMLElement) {
+        this.currentTarget = target;
+        this.updateArrow();
     }
 }
 
