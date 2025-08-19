@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npm run build && cp index.html dist/ && cp demo.html dist/ && cp -r examples dist/"
   publish = "dist"
 
 [[redirects]]
