@@ -58,7 +58,5 @@
     "vite": "^5.3.3",
     "vite-plugin-dts": "^4.5.4"
   },
-  "dependencies": {
-    "openai": "^5.12.2"
-  }
+  "dependencies": {}
 }

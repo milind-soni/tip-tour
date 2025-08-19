@@ -121,15 +121,15 @@ class AITooltip {
 
     private async handleUserInput(input: string) {
         // Show loading immediately
-        this.tooltipMessage.innerHTML = '<div class="loading">Processing your request...</div>';
+        this.tooltipMessage.innerHTML = '<div class="loading">Processing...</div>';
         
         // Keep tooltip visible during API call
         this.showTooltip();
         
         try {
-            const response = await this.callAI(input);
+            const response = await callOpenAI(input);
             this.tooltipMessage.textContent = response;
-            // Keep tooltip visible after response for at least 10 seconds for reading
+            // Keep tooltip visible after response for reading
             this.showTooltip();
             
             // Extend visibility for reading the response
@@ -137,15 +137,11 @@ class AITooltip {
                 if (this.isVisible && document.activeElement !== this.tooltipInput) {
                     // Allow natural hide after reading time
                 }
-            }, 10000);
+            }, 5000);
         } catch (error) {
-            this.tooltipMessage.textContent = 'Sorry, I encountered an error. Please try again.';
-            console.error('AI API Error:', error);
+            this.tooltipMessage.textContent = 'Sorry, something went wrong. Please try again.';
+            console.error('Error:', error);
         }
-    }
-
-    private async callAI(prompt: string): Promise<string> {
-        return await callOpenAI(prompt);
     }
 
     private showTooltip() {
