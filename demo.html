@@ -13,37 +13,58 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #fafafa;
+            background-image: 
+                linear-gradient(#e5e5e5 1px, transparent 1px),
+                linear-gradient(90deg, #e5e5e5 1px, transparent 1px);
+            background-size: 20px 20px;
             min-height: 100vh;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
+            padding: 0 80px;
+            color: #1a1a1a;
         }
 
         .container {
-            text-align: center;
-            padding: 60px 20px;
-            max-width: 600px;
+            display: flex;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 80px;
+            align-items: center;
+        }
+        
+        .left-section {
+            flex: 1;
+            max-width: 500px;
+        }
+        
+        .right-section {
+            flex: 1;
+            position: relative;
+            min-height: 500px;
         }
 
         h1 {
             font-size: 3rem;
             margin-bottom: 16px;
+            color: #111;
+            text-align: left;
         }
 
         .subtitle {
             font-size: 1.25rem;
-            opacity: 0.9;
+            color: #666;
             margin-bottom: 48px;
+            text-align: left;
         }
 
         .controls {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             border-radius: 16px;
             padding: 24px;
-            margin-top: 48px;
+            border: 1px solid #e5e5e5;
         }
 
         .control-group {
@@ -55,7 +76,8 @@
             display: block;
             margin-bottom: 8px;
             font-size: 14px;
-            opacity: 0.9;
+            color: #333;
+            font-weight: 500;
         }
 
         input[type="range"] {
@@ -65,7 +87,7 @@
 
         .value {
             font-size: 12px;
-            opacity: 0.7;
+            color: #666;
         }
 
         .buttons {
@@ -76,9 +98,9 @@
         }
 
         button {
-            background: rgba(255, 255, 255, 0.2);
+            background: #111;
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid #111;
             padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
@@ -87,78 +109,103 @@
         }
 
         button:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: #333;
+            border-color: #333;
             transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            border-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .target-button {
-            position: fixed;
+            position: absolute;
             background: white;
-            color: #764ba2;
-            border: 2px solid #764ba2;
-            padding: 12px 24px;
-            border-radius: 8px;
+            color: #111;
+            border: 2px solid #111;
+            padding: 16px 32px;
+            border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            min-width: 160px;
         }
 
         .target-button:hover {
-            background: #764ba2;
+            background: #111;
             color: white;
             transform: scale(1.05);
         }
-
+        
         #target1 {
-            top: 50px;
-            right: 50px;
+            top: 20px;
+            right: 20px;
         }
-
+        
         #target2 {
-            bottom: 50px;
-            left: 50px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        #target3 {
+            bottom: 20px;
+            left: 20px;
         }
 
         .info {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.5);
+            background: white;
+            border: 1px solid #e5e5e5;
             padding: 12px 16px;
             border-radius: 8px;
             font-size: 12px;
             font-family: monospace;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            color: #333;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>✨ TipTour Demo</h1>
-        <p class="subtitle">Smooth, performant tooltip with lazy-brush inspired movement</p>
-        
-        <div class="controls">
-            <div class="control-group">
-                <label for="friction">Friction (Smoothness)</label>
-                <input type="range" id="friction" min="0" max="100" value="92">
-                <div class="value">Value: <span id="frictionValue">0.92</span></div>
-            </div>
+        <div class="left-section">
+            <h1>✨ TipTour Demo</h1>
+            <p class="subtitle">Smooth, performant tooltip with AI</p>
             
-            <div class="control-group">
-                <label for="radius">Smooth Radius</label>
-                <input type="range" id="radius" min="10" max="100" value="30">
-                <div class="value">Value: <span id="radiusValue">30</span>px</div>
-            </div>
-            
-            <div class="buttons">
-                <button id="toggleBtn">Disable</button>
-                <button id="arrowBtn">Add Arrow</button>
-                <button id="inputBtn">Add Input</button>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="friction">Friction (Smoothness)</label>
+                    <input type="range" id="friction" min="0" max="100" value="92">
+                    <div class="value">Value: <span id="frictionValue">0.92</span></div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="radius">Smooth Radius</label>
+                    <input type="range" id="radius" min="10" max="100" value="30">
+                    <div class="value">Value: <span id="radiusValue">30</span>px</div>
+                </div>
+                
+                <div class="buttons">
+                    <button id="toggleBtn">Disable</button>
+                    <button id="arrowBtn">Add Arrow</button>
+                    <button id="inputBtn">Add Input</button>
+                </div>
             </div>
         </div>
+        
+        <div class="right-section">
+            <button id="target1" class="target-button">📍 Target 1</button>
+            <button id="target2" class="target-button">🎯 Target 2</button>
+            <button id="target3" class="target-button">✨ Target 3</button>
+        </div>
     </div>
-
-    <button id="target1" class="target-button">Target 1</button>
-    <button id="target2" class="target-button">Target 2</button>
 
     <div class="info">
         <div>Mouse: <span id="mousePos">0, 0</span></div>
@@ -175,10 +222,12 @@
             smoothRadius: 30,
             friction: 0.92,
             offset: { x: 20, y: 20 },
-            arrow: { enabled: false },
+            arrow: { enabled: false },  // Start with arrow disabled
             hideDelay: 10000,
             onUpdate: (pos) => {
                 document.getElementById('smoothPos').textContent = `${Math.round(pos.x)}, ${Math.round(pos.y)}`
+                const distance = Math.round(tiptour.smoothCursor?.getDistance() || 0)
+                document.getElementById('distance').textContent = distance
             }
         })
         
@@ -228,7 +277,8 @@
             if (!hasArrow) {
                 const targets = [
                     document.getElementById('target1'),
-                    document.getElementById('target2')
+                    document.getElementById('target2'),
+                    document.getElementById('target3')
                 ]
                 tiptour.addArrow(targets)
                 hasArrow = true
@@ -258,6 +308,10 @@
         
         document.getElementById('target2').addEventListener('click', () => {
             tiptour.setContent('<strong>Target 2 clicked!</strong><br>Notice how smoothly the tooltip follows.')
+        })
+        
+        document.getElementById('target3').addEventListener('click', () => {
+            tiptour.setContent('<strong>Target 3 clicked!</strong><br>Try moving between all three targets!')
         })
     </script>
 </body>

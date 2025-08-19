@@ -1,7 +1,7 @@
 {
   "name": "tiptour",
   "version": "2.0.0",
-  "description": "Smooth, performant tooltip library with lazy-brush inspired movement",
+  "description": "Smooth, performant tooltip library with advanced movement algorithms",
   "type": "module",
   "files": [
     "dist",
@@ -38,7 +38,7 @@
     "library",
     "typescript",
     "performant",
-    "lazy-brush"
+    "interactive"
   ],
   "author": "Milind Soni",
   "license": "MIT",

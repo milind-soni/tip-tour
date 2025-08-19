@@ -108,14 +108,19 @@ export class SmoothCursor {
       const currentFriction = options.friction !== undefined ? options.friction : this.friction
       
       if (isOutside) {
+        // Smooth movement proportional to how far outside the radius we are
+        const overshoot = this.distance - this.radius
+        const moveDistance = overshoot * (1 - currentFriction)
+        
         this.smoothPosition.moveByAngle(
           this.angle,
-          this.distance - this.radius,
-          currentFriction
+          moveDistance,
+          undefined // Don't apply friction twice
         )
         this._hasMoved = true
       } else if (this.distance > 0.1) {
-        this.smoothPosition.lerp(this.pointer, 1 - currentFriction)
+        // Gentle drift toward center when inside radius
+        this.smoothPosition.lerp(this.pointer, (1 - currentFriction) * 0.1)
         this._hasMoved = true
       }
     } else {

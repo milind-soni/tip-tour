@@ -72,9 +72,34 @@ export class TipTour {
     return tooltip
   }
   
+  private createArrow(): void {
+    if (this.arrow) return
+    
+    const arrowOptions = this.options.arrow as ArrowOptions
+    this.arrow = document.createElement('div')
+    this.arrow.className = 'tiptour-arrow'
+    this.arrow.innerHTML = `
+      <div class="tiptour-arrow-svg">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path class="tiptour-arrow-path" d="M8 4 L16 12 L8 20" 
+                stroke="${arrowOptions.color || '#1a1a1a'}" 
+                stroke-width="2.5" 
+                stroke-linecap="round" 
+                stroke-linejoin="round"/>
+        </svg>
+      </div>
+    `
+    this.tooltip.appendChild(this.arrow)
+  }
+  
   private init(): void {
     if (this.options.enabled) {
       this.enable()
+    }
+    
+    // Initialize arrow if enabled
+    if (this.options.arrow && typeof this.options.arrow === 'object' && this.options.arrow.enabled) {
+      this.createArrow()
     }
     
     this.startAnimationLoop()
@@ -298,25 +323,17 @@ export class TipTour {
   }
   
   addArrow(targets: HTMLElement[]): void {
-    const arrowOptions = this.options.arrow as ArrowOptions
-    if (!arrowOptions || !arrowOptions.enabled) return
-    
+    // Store the targets
     this.arrowTargets = targets
     
-    this.arrow = document.createElement('div')
-    this.arrow.className = 'tiptour-arrow'
-    this.arrow.innerHTML = `
-      <div class="tiptour-arrow-svg">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path class="tiptour-arrow-path" d="M8 4 L16 12 L8 20" 
-                stroke="${arrowOptions.color || '#1a1a1a'}" 
-                stroke-width="2.5" 
-                stroke-linecap="round" 
-                stroke-linejoin="round"/>
-        </svg>
-      </div>
-    `
-    this.tooltip.appendChild(this.arrow)
+    // Create arrow if it doesn't exist
+    if (!this.arrow) {
+      this.createArrow()
+    }
+  }
+  
+  getSmoothCursor(): SmoothCursor {
+    return this.smoothCursor
   }
   
   setFriction(friction: number): void {
