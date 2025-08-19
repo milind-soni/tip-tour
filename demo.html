@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TipTour Demo - Smooth Tooltip Library</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            padding: 60px 20px;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 48px;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 48px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 4px;
+        }
+
+        .value {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .target-button {
+            position: fixed;
+            background: white;
+            color: #764ba2;
+            border: 2px solid #764ba2;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .target-button:hover {
+            background: #764ba2;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        #target1 {
+            top: 50px;
+            right: 50px;
+        }
+
+        #target2 {
+            bottom: 50px;
+            left: 50px;
+        }
+
+        .info {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ TipTour Demo</h1>
+        <p class="subtitle">Smooth, performant tooltip with lazy-brush inspired movement</p>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="friction">Friction (Smoothness)</label>
+                <input type="range" id="friction" min="0" max="100" value="92">
+                <div class="value">Value: <span id="frictionValue">0.92</span></div>
+            </div>
+            
+            <div class="control-group">
+                <label for="radius">Smooth Radius</label>
+                <input type="range" id="radius" min="10" max="100" value="30">
+                <div class="value">Value: <span id="radiusValue">30</span>px</div>
+            </div>
+            
+            <div class="buttons">
+                <button id="toggleBtn">Disable</button>
+                <button id="arrowBtn">Add Arrow</button>
+                <button id="inputBtn">Add Input</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="target1" class="target-button">Target 1</button>
+    <button id="target2" class="target-button">Target 2</button>
+
+    <div class="info">
+        <div>Mouse: <span id="mousePos">0, 0</span></div>
+        <div>Smooth: <span id="smoothPos">0, 0</span></div>
+        <div>Distance: <span id="distance">0</span>px</div>
+    </div>
+
+    <script type="module">
+        import { TipTour } from './src/index.ts'
+        
+        // Initialize TipTour
+        const tiptour = new TipTour({
+            enabled: true,
+            smoothRadius: 30,
+            friction: 0.92,
+            offset: { x: 20, y: 20 },
+            arrow: { enabled: false },
+            hideDelay: 10000,
+            onUpdate: (pos) => {
+                document.getElementById('smoothPos').textContent = `${Math.round(pos.x)}, ${Math.round(pos.y)}`
+            }
+        })
+        
+        // Set initial content
+        tiptour.setContent('<strong>Welcome to TipTour!</strong><br>Move your mouse around to see smooth tooltip movement.')
+        
+        // Track mouse position
+        document.addEventListener('mousemove', (e) => {
+            document.getElementById('mousePos').textContent = `${e.clientX}, ${e.clientY}`
+        })
+        
+        // Controls
+        const frictionSlider = document.getElementById('friction')
+        const radiusSlider = document.getElementById('radius')
+        const toggleBtn = document.getElementById('toggleBtn')
+        const arrowBtn = document.getElementById('arrowBtn')
+        const inputBtn = document.getElementById('inputBtn')
+        
+        let isEnabled = true
+        let hasArrow = false
+        let hasInput = false
+        
+        frictionSlider.addEventListener('input', (e) => {
+            const value = e.target.value / 100
+            document.getElementById('frictionValue').textContent = value.toFixed(2)
+            tiptour.setFriction(value)
+        })
+        
+        radiusSlider.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value)
+            document.getElementById('radiusValue').textContent = value
+            tiptour.setSmoothRadius(value)
+        })
+        
+        toggleBtn.addEventListener('click', () => {
+            isEnabled = !isEnabled
+            if (isEnabled) {
+                tiptour.enable()
+                toggleBtn.textContent = 'Disable'
+            } else {
+                tiptour.disable()
+                toggleBtn.textContent = 'Enable'
+            }
+        })
+        
+        arrowBtn.addEventListener('click', () => {
+            if (!hasArrow) {
+                const targets = [
+                    document.getElementById('target1'),
+                    document.getElementById('target2')
+                ]
+                tiptour.addArrow(targets)
+                hasArrow = true
+                arrowBtn.textContent = 'Arrow Added'
+                arrowBtn.disabled = true
+            }
+        })
+        
+        inputBtn.addEventListener('click', () => {
+            if (!hasInput) {
+                tiptour.addInput('Type a message...', (value) => {
+                    tiptour.setMessage(`You typed: "${value}"`)
+                    setTimeout(() => {
+                        tiptour.setMessage('Type another message!')
+                    }, 3000)
+                })
+                hasInput = true
+                inputBtn.textContent = 'Input Added'
+                inputBtn.disabled = true
+            }
+        })
+        
+        // Target button interactions
+        document.getElementById('target1').addEventListener('click', () => {
+            tiptour.setContent('<strong>Target 1 clicked!</strong><br>The arrow points to the closest target.')
+        })
+        
+        document.getElementById('target2').addEventListener('click', () => {
+            tiptour.setContent('<strong>Target 2 clicked!</strong><br>Notice how smoothly the tooltip follows.')
+        })
+    </script>
+</body>
+</html>

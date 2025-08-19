@@ -1,0 +1,8 @@
+export { TipTour } from './core/TipTour'
+export { SmoothCursor } from './core/SmoothCursor'
+export { TooltipPoint } from './core/TooltipPoint'
+export type { Point } from './core/TooltipPoint'
+export type { TipTourOptions, TooltipState, ArrowOptions } from './types'
+
+import { TipTour } from './core/TipTour'
+export default TipTour

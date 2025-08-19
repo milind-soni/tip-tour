@@ -34,7 +34,6 @@ class AITooltip {
 
     private setupMouseTracking() {
         let mouseMoveTimeout: ReturnType<typeof setTimeout>;
-        let animationFrameId: number;
         let isUpdating = false;
 
         document.addEventListener('mousemove', (e) => {
@@ -47,7 +46,7 @@ class AITooltip {
             // Use RAF for smooth position updates without throttling
             if (!isUpdating) {
                 isUpdating = true;
-                animationFrameId = requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
                     this.updateTooltipPosition();
                     this.updateArrow();
                     isUpdating = false;

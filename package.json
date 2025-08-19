@@ -1,17 +1,27 @@
 {
-  "name": "tiptour-selector",
-  "version": "1.0.0",
-  "description": "",
+  "name": "tiptour",
+  "version": "2.0.0",
+  "description": "Smooth, performant tooltip library with lazy-brush inspired movement",
+  "type": "module",
   "files": [
-    "dist"
+    "dist",
+    "src/styles"
   ],
-  "main": "./dist/tiptour-selector.umd.js",
-  "module": "./dist/tiptour-selector.es.js",
+  "main": "./dist/tiptour.umd.cjs",
+  "module": "./dist/tiptour.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/tiptour-selector.es.js",
-      "require": "./dist/tiptour-selector.umd.js"
-    }
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/tiptour.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/tiptour.umd.cjs"
+      }
+    },
+    "./styles": "./src/styles/tiptour.css"
   },
   "scripts": {
     "dev": "vite",
@@ -19,9 +29,23 @@
     "watch": "nodemon -e ts,html --exec \"npm run build\"",
     "preview": "vite preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "tooltip",
+    "mouse",
+    "smooth",
+    "animation",
+    "ui",
+    "library",
+    "typescript",
+    "performant",
+    "lazy-brush"
+  ],
+  "author": "Milind Soni",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/tiptour"
+  },
   "nodemonConfig": {
     "ignore": [
       "./dist/**"
@@ -31,7 +55,8 @@
     "nodemon": "^3.1.4",
     "terser": "^5.31.2",
     "typescript": "^5.5.3",
-    "vite": "^5.3.3"
+    "vite": "^5.3.3",
+    "vite-plugin-dts": "^4.5.4"
   },
   "dependencies": {
     "openai": "^5.12.2"
