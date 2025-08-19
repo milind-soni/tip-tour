@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TipTour Demo - Smooth Tooltip Library</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #fafafa;
+            background-image: 
+                linear-gradient(#e5e5e5 1px, transparent 1px),
+                linear-gradient(90deg, #e5e5e5 1px, transparent 1px);
+            background-size: 20px 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 80px;
+            color: #1a1a1a;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 80px;
+            align-items: center;
+        }
+        
+        .left-section {
+            flex: 1;
+            max-width: 500px;
+        }
+        
+        .right-section {
+            flex: 1;
+            position: relative;
+            min-height: 500px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            color: #111;
+            text-align: left;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #666;
+            margin-bottom: 48px;
+            text-align: left;
+        }
+
+        .controls {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 4px;
+        }
+
+        .value {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        button {
+            background: #111;
+            color: white;
+            border: 1px solid #111;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #333;
+            border-color: #333;
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            border-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .target-button {
+            position: absolute;
+            background: white;
+            color: #111;
+            border: 2px solid #111;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            min-width: 160px;
+        }
+
+        .target-button:hover {
+            background: #111;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        #target1 {
+            top: 20px;
+            right: 20px;
+        }
+        
+        #target2 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        #target3 {
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .info {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border: 1px solid #e5e5e5;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: monospace;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            color: #333;
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/demo-CVwyWKLz.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="stylesheet" crossorigin href="/assets/demo-l-mnXpmc.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <h1>✨ TipTour Demo</h1>
+            <p class="subtitle">Smooth, performant tooltip with AI</p>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="friction">Friction (Smoothness)</label>
+                    <input type="range" id="friction" min="0" max="100" value="92">
+                    <div class="value">Value: <span id="frictionValue">0.92</span></div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="radius">Smooth Radius</label>
+                    <input type="range" id="radius" min="10" max="100" value="30">
+                    <div class="value">Value: <span id="radiusValue">30</span>px</div>
+                </div>
+                
+                <div class="buttons">
+                    <button id="toggleBtn">Disable</button>
+                    <button id="arrowBtn">Add Arrow</button>
+                    <button id="inputBtn">Add Input</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-section">
+            <button id="target1" class="target-button">📍 Target 1</button>
+            <button id="target2" class="target-button">🎯 Target 2</button>
+            <button id="target3" class="target-button">✨ Target 3</button>
+        </div>
+    </div>
+
+    <div class="info">
+        <div>Mouse: <span id="mousePos">0, 0</span></div>
+        <div>Smooth: <span id="smoothPos">0, 0</span></div>
+        <div>Distance: <span id="distance">0</span>px</div>
+    </div>
+
+</body>
+</html>

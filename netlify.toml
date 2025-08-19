@@ -1,6 +1,6 @@
 [build]
-  command = "npm run build && cp index.html dist/ && cp demo.html dist/ && cp -r examples dist/"
-  publish = "dist"
+  command = "npm run build && npx vite build --config vite.config.demo.ts"
+  publish = "dist-site"
 
 [[redirects]]
   from = "/*"
