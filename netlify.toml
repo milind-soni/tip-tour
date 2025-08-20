@@ -9,6 +9,8 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  # Tell Netlify that Supabase anon key is safe to be public
+  SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_ANON_KEY,VITE_SUPABASE_URL"
 
 [[headers]]
   for = "/*"
