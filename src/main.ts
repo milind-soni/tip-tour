@@ -67,6 +67,15 @@ class AITooltip {
         document.addEventListener('keydown', (e) => {
             if (!this.isVisible) return;
             
+            // Don't interfere with other input elements (like the waitlist form)
+            const activeElement = document.activeElement;
+            if (activeElement && 
+                (activeElement.tagName === 'INPUT' || 
+                 activeElement.tagName === 'TEXTAREA') && 
+                activeElement !== this.tooltipInput) {
+                return; // Let other inputs handle their own keyboard events
+            }
+            
             if (e.key === 'Escape') {
                 this.hideTooltip();
                 return;
