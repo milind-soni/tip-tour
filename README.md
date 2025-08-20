@@ -31,17 +31,46 @@ Experience the interactive tooltip with dynamic arrow navigation:
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- Node.js 16+ 
-- npm or yarn
-
 ### Installation
+
+```bash
+npm install tiptour
+```
+
+### Usage
+
+```javascript
+import TipTour from 'tiptour';
+import 'tiptour/styles';
+
+// Initialize the tooltip
+const tooltip = new TipTour({
+  smoothRadius: 30,      // Pixels before movement starts
+  friction: 0.92,        // Smoothing factor (0-1)
+  hideDelay: 5000,       // Auto-hide after 5 seconds
+  offset: { x: 20, y: 20 }
+});
+
+// Set custom content
+tooltip.setContent('<p>Hello from TipTour!</p>');
+
+// Add interactive input
+tooltip.addInput('Ask me anything...', async (value) => {
+  // Handle user input
+  console.log('User typed:', value);
+  return 'Response to user';
+});
+
+// Add arrow pointing to elements
+tooltip.addArrow(['#button1', '#button2']);
+```
+
+### Development Setup
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/milind-soni/tiptour.git
-   cd tiptour
+   git clone https://github.com/milind-soni/tip-tour.git
+   cd tip-tour
    ```
 
 2. **Install dependencies**

@@ -293,6 +293,82 @@
             transform: rotate(1deg);
             border-radius: 15px 225px 15px 255px/225px 15px 255px 15px;
         }
+        
+        /* Waitlist Styles */
+        .waitlist-section {
+            margin: 48px 0;
+        }
+        
+        .waitlist-form {
+            display: flex;
+            gap: 12px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .waitlist-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        
+        .waitlist-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .waitlist-button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+        
+        .waitlist-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .waitlist-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .waitlist-message {
+            margin-top: 16px;
+            font-size: 14px;
+            min-height: 20px;
+        }
+        
+        .waitlist-message.success {
+            color: #10b981;
+        }
+        
+        .waitlist-message.error {
+            color: #ef4444;
+        }
+        
+        @media (max-width: 480px) {
+            .waitlist-form {
+                flex-direction: column;
+            }
+            
+            .waitlist-button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -314,6 +390,24 @@
                 <div class="feature-icon">✓</div>
                 <span>AI powered</span>
             </div>
+        </div>
+        
+        <!-- Waitlist Form -->
+        <div class="waitlist-section">
+            <form id="waitlist-form" class="waitlist-form">
+                <input 
+                    type="email" 
+                    id="waitlist-email" 
+                    class="waitlist-input" 
+                    placeholder="Enter your email for early access" 
+                    required
+                >
+                <button type="submit" class="waitlist-button">
+                    <span class="button-text">Join Waitlist</span>
+                    <span class="button-loading" style="display: none;">...</span>
+                </button>
+            </form>
+            <p class="waitlist-message" id="waitlist-message"></p>
         </div>
         
         <div class="cta">
@@ -340,5 +434,77 @@
     </div>
 
     <script type="module" src="./src/main.ts"></script>
+    
+    <!-- Supabase Waitlist Integration -->
+    <script type="module">
+        // Get Supabase credentials from environment variables (Vite will replace these at build time)
+        const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'YOUR_SUPABASE_PROJECT_URL';
+        const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+        
+        // Import Supabase client
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        
+        // Initialize Supabase client
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Handle form submission
+        const form = document.getElementById('waitlist-form');
+        const emailInput = document.getElementById('waitlist-email');
+        const message = document.getElementById('waitlist-message');
+        const buttonText = document.querySelector('.button-text');
+        const buttonLoading = document.querySelector('.button-loading');
+        const submitButton = form.querySelector('button[type="submit"]');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            
+            // Show loading state
+            submitButton.disabled = true;
+            buttonText.style.display = 'none';
+            buttonLoading.style.display = 'inline';
+            message.textContent = '';
+            message.className = 'waitlist-message';
+            
+            try {
+                // Insert email into Supabase
+                const { data, error } = await supabase
+                    .from('waitlist')
+                    .insert([{ 
+                        email: email,
+                        source: 'landing_page',
+                        metadata: {
+                            referrer: document.referrer,
+                            userAgent: navigator.userAgent,
+                            timestamp: new Date().toISOString()
+                        }
+                    }])
+                    .select();
+                
+                if (error) {
+                    if (error.code === '23505') { // Unique constraint violation
+                        message.textContent = "You're already on the list! We'll notify you soon.";
+                        message.className = 'waitlist-message success';
+                    } else {
+                        throw error;
+                    }
+                } else {
+                    message.textContent = "🎉 Welcome! You're on the list for early access.";
+                    message.className = 'waitlist-message success';
+                    emailInput.value = '';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                message.textContent = 'Something went wrong. Please try again.';
+                message.className = 'waitlist-message error';
+            } finally {
+                // Reset button state
+                submitButton.disabled = false;
+                buttonText.style.display = 'inline';
+                buttonLoading.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
