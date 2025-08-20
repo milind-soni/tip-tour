@@ -1,9 +1,17 @@
-dist/*
-node_modules/*
+dist/
+node_modules/
 .env
 .env.local
 .env.production
 .env.*.local
 
-# Claude context file
-CLAUDE.md
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist-site/

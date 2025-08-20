@@ -322,9 +322,15 @@ export class TipTour {
     })
   }
   
-  addArrow(targets: HTMLElement[]): void {
-    // Store the targets
-    this.arrowTargets = targets
+  addArrow(targets: string[] | HTMLElement[]): void {
+    // Convert selectors to elements if needed
+    if (targets.length > 0 && typeof targets[0] === 'string') {
+      this.arrowTargets = (targets as string[]).map(selector => 
+        document.querySelector(selector) as HTMLElement
+      ).filter(el => el !== null)
+    } else {
+      this.arrowTargets = targets as HTMLElement[]
+    }
     
     // Create arrow if it doesn't exist
     if (!this.arrow) {
