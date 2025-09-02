@@ -444,6 +444,14 @@
             setTimeout(() => tip.setMessage('Ask another question!'), 2000)
         })
         tip.addArrow(['#button-one', '#button-two'])
+        document.getElementById('button-one')?.addEventListener('click', () => {
+            const other = document.getElementById('button-two')
+            if (other) tip.setArrowTarget(other)
+        })
+        document.getElementById('button-two')?.addEventListener('click', () => {
+            const other = document.getElementById('button-one')
+            if (other) tip.setArrowTarget(other)
+        })
         tip.show()
         window.tip = tip
     </script>

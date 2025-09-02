@@ -10,6 +10,7 @@ export class TipTour {
   private tooltipInput: HTMLInputElement | null = null
   private arrow: HTMLElement | null = null
   private arrowTargets: HTMLElement[] = []
+  private preferredArrowTarget: HTMLElement | null = null
   
   private options: Required<TipTourOptions>
   private state: TooltipState
@@ -199,19 +200,27 @@ export class TipTour {
     let closestTarget = this.arrowTargets[0]
     let minDistance = Infinity
     
-    for (const target of this.arrowTargets) {
-      const targetRect = target.getBoundingClientRect()
-      const targetCenterX = targetRect.left + targetRect.width / 2
-      const targetCenterY = targetRect.top + targetRect.height / 2
-      
-      const distance = Math.sqrt(
-        Math.pow(targetCenterX - tooltipCenterX, 2) +
-        Math.pow(targetCenterY - tooltipCenterY, 2)
-      )
-      
-      if (distance < minDistance) {
-        minDistance = distance
-        closestTarget = target
+    if (this.preferredArrowTarget && this.arrowTargets.includes(this.preferredArrowTarget)) {
+      closestTarget = this.preferredArrowTarget
+      const r = closestTarget.getBoundingClientRect()
+      const cx = r.left + r.width / 2
+      const cy = r.top + r.height / 2
+      minDistance = Math.sqrt(Math.pow(cx - tooltipCenterX, 2) + Math.pow(cy - tooltipCenterY, 2))
+    } else {
+      for (const target of this.arrowTargets) {
+        const targetRect = target.getBoundingClientRect()
+        const targetCenterX = targetRect.left + targetRect.width / 2
+        const targetCenterY = targetRect.top + targetRect.height / 2
+        
+        const distance = Math.sqrt(
+          Math.pow(targetCenterX - tooltipCenterX, 2) +
+          Math.pow(targetCenterY - tooltipCenterY, 2)
+        )
+        
+        if (distance < minDistance) {
+          minDistance = distance
+          closestTarget = target
+        }
       }
     }
     
@@ -254,6 +263,11 @@ export class TipTour {
       this.tooltip.classList.add('visible')
       if (this.rafId === null) this.startAnimationLoop()
       this.options.onShow()
+      if (this.tooltipInput) {
+        setTimeout(() => {
+          this.tooltipInput && this.tooltipInput.focus()
+        }, 50)
+      }
     }
   }
   
@@ -298,6 +312,7 @@ export class TipTour {
     this.tooltipInput.className = 'tiptour-input'
     this.tooltipInput.placeholder = placeholder
     this.tooltip.appendChild(this.tooltipInput)
+    this.tooltip.style.pointerEvents = 'auto'
     
     this.onInputHandler = onInput || null
     
@@ -341,6 +356,10 @@ export class TipTour {
     if (!this.arrow) {
       this.createArrow()
     }
+  }
+  
+  setArrowTarget(target: HTMLElement | null): void {
+    this.preferredArrowTarget = target
   }
   
   getSmoothCursor(): SmoothCursor {
