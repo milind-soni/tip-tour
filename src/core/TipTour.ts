@@ -18,6 +18,7 @@ export class TipTour {
   private hideTimeout: ReturnType<typeof setTimeout> | null = null
   private showTimeout: ReturnType<typeof setTimeout> | null = null
   private lastMouseEvent: MouseEvent | null = null
+  private lastUpdateAt: number = 0
   
   private onInputHandler: ((value: string) => void) | null = null
   
@@ -101,8 +102,6 @@ export class TipTour {
     if (this.options.arrow && typeof this.options.arrow === 'object' && this.options.arrow.enabled) {
       this.createArrow()
     }
-    
-    this.startAnimationLoop()
   }
   
   private startAnimationLoop(): void {
@@ -158,7 +157,11 @@ export class TipTour {
       
       this.updateTooltipPosition()
       this.updateArrow()
-      this.options.onUpdate(smoothPos)
+      const now = performance.now()
+      if (now - this.lastUpdateAt >= 16) { // ~60fps throttle
+        this.lastUpdateAt = now
+        this.options.onUpdate(smoothPos)
+      }
     }
   }
   
@@ -249,6 +252,7 @@ export class TipTour {
     if (!this.state.visible) {
       this.state.visible = true
       this.tooltip.classList.add('visible')
+      if (this.rafId === null) this.startAnimationLoop()
       this.options.onShow()
     }
   }
@@ -261,13 +265,14 @@ export class TipTour {
     if (this.state.visible) {
       this.state.visible = false
       this.tooltip.classList.remove('visible')
+      this.stopAnimationLoop()
       this.options.onHide()
     }
   }
   
   setContent(content: string): void {
     this.state.content = content
-    this.tooltipMessage.innerHTML = content
+    this.tooltipMessage.innerHTML = this.sanitizeHTML(content)
   }
   
   setMessage(message: string): void {
@@ -367,5 +372,26 @@ export class TipTour {
     
     if (this.hideTimeout) clearTimeout(this.hideTimeout)
     if (this.showTimeout) clearTimeout(this.showTimeout)
+  }
+
+  private sanitizeHTML(html: string): string {
+    try {
+      const template = document.createElement('template')
+      template.innerHTML = html
+      const scripts = template.content.querySelectorAll('script')
+      scripts.forEach(s => s.remove())
+      const all = template.content.querySelectorAll('*')
+      all.forEach(el => {
+        // remove inline event handlers
+        Array.from(el.attributes).forEach(attr => {
+          if (attr.name.toLowerCase().startsWith('on')) {
+            el.removeAttribute(attr.name)
+          }
+        })
+      })
+      return template.innerHTML
+    } catch {
+      return ''
+    }
   }
 }
