@@ -1,6 +1,6 @@
 {
   "name": "tiptour",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Smooth, performant tooltip library with advanced movement algorithms",
   "type": "module",
   "files": [
