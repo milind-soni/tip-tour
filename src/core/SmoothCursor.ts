@@ -88,10 +88,6 @@ export class SmoothCursor {
   update(newPointerPoint: Point, options: UpdateOptions = {}): boolean {
     this._hasMoved = false
     
-    if (this.pointer.equalsTo(newPointerPoint) && !options.immediate) {
-      return false
-    }
-    
     this.pointer.update(newPointerPoint)
     
     if (options.immediate) {

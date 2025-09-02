@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TipTour Workflow MVP</title>
+    <link rel="stylesheet" href="../dist/style.css">
+    <style>
+      body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 24px; }
+      .row { margin: 12px 0; }
+      textarea { width: 100%; height: 200px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      button { margin-right: 8px; }
+      .panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; }
+      .playground { position: relative; height: 60vh; min-height: 360px; }
+      #btn { position: absolute; top: 24px; left: 24px; }
+      #btn2 { position: absolute; bottom: 24px; right: 24px; }
+    </style>
+  </head>
+  <body>
+    <h1>TipTour Workflow MVP</h1>
+    <div class="panel">
+      <div class="row">
+        <button id="record">Start Recording</button>
+        <button id="stop">Stop</button>
+        <button id="play">Play (Guide)</button>
+        <button id="play-auto">Play (Auto)</button>
+      </div>
+      <div class="row">
+        <button id="save">Save Local</button>
+        <button id="download">Download JSON</button>
+        <input id="file" type="file" accept="application/json" />
+      </div>
+      <div class="row">
+        <textarea id="output" placeholder="Workflow JSON will appear here..."></textarea>
+      </div>
+    </div>
+
+    <div class="panel playground" style="margin-top:16px;">
+      <button id="btn">Click Me</button>
+      <button id="btn2" role="button">Another Button</button>
+    </div>
+
+    <script type="module">
+      import { createRecorder, createPlayer, validateWorkflow, saveWorkflowLocal, downloadWorkflow, readWorkflowFile } from '../dist/tiptour.js'
+
+      const output = document.getElementById('output')
+      const recordBtn = document.getElementById('record')
+      const stopBtn = document.getElementById('stop')
+      const playBtn = document.getElementById('play')
+      const playAutoBtn = document.getElementById('play-auto')
+      const saveBtn = document.getElementById('save')
+      const downloadBtn = document.getElementById('download')
+      const fileInput = document.getElementById('file')
+
+      const rec = createRecorder()
+      let wf = null
+
+      recordBtn.onclick = () => { rec.start() }
+      stopBtn.onclick = () => { rec.stop(); wf = rec.getWorkflow('demo'); output.value = JSON.stringify(wf, null, 2) }
+
+      playBtn.onclick = async () => {
+        if (!wf) return
+        const { ok, errors } = validateWorkflow(wf)
+        if (!ok) return alert(errors.join('\n'))
+        const player = createPlayer(wf, { mode: 'guide' })
+        await player.play()
+      }
+
+      playAutoBtn.onclick = async () => {
+        if (!wf) return
+        const { ok, errors } = validateWorkflow(wf)
+        if (!ok) return alert(errors.join('\n'))
+        const player = createPlayer(wf, { mode: 'auto' })
+        await player.play()
+      }
+
+      saveBtn.onclick = () => { if (wf) saveWorkflowLocal(wf) }
+      downloadBtn.onclick = () => { if (wf) downloadWorkflow(wf) }
+      fileInput.onchange = async (e) => {
+        const f = e.target.files[0]; if (!f) return
+        wf = await readWorkflowFile(f); output.value = JSON.stringify(wf, null, 2)
+      }
+    </script>
+  </body>
+  </html>
+
+
