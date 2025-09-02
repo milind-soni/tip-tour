@@ -370,6 +370,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="/dist/style.css">
 </head>
 <body>
     <div class="container">
@@ -434,6 +435,13 @@
     </div>
 
     <script type="module" src="./src/main.ts"></script>
+    <script type="module">
+        import { TipTour } from '/dist/tiptour.js'
+        const tip = new TipTour({ hideDelay: 5000, offset: { x: 20, y: 20 } })
+        tip.setContent('TipTour ready. Move your mouse to see it follow.')
+        tip.show()
+        window.tip = tip
+    </script>
     
     <!-- Supabase Waitlist Integration -->
     <script type="module">
