@@ -439,6 +439,11 @@
         import { TipTour } from '/dist/tiptour.js'
         const tip = new TipTour({ hideDelay: 5000, offset: { x: 20, y: 20 } })
         tip.setContent('TipTour ready. Move your mouse to see it follow.')
+        tip.addInput('Ask me anything...', (value) => {
+            tip.setMessage(`You typed: "${value}"`)
+            setTimeout(() => tip.setMessage('Ask another question!'), 2000)
+        })
+        tip.addArrow(['#button-one', '#button-two'])
         tip.show()
         window.tip = tip
     </script>
