@@ -37,6 +37,9 @@ export interface Workflow {
 
 export interface PlayerOptions {
   mode?: 'guide' | 'auto'
+  includeInputUI?: boolean
+  inputPlaceholder?: string
+  onInput?: (value: string) => void
 }
 
 export interface ValidationResult {

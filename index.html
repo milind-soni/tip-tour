@@ -419,21 +419,29 @@
     <button id="button-one" class="hand-drawn-button">📍 Click me!</button>
     <button id="button-two" class="hand-drawn-button">✨ Then me!</button>
 
-    <div id="tooltip">
-        <div class="tooltip-arrow" id="tooltip-arrow">
-            <div class="v-arrow">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- V-shaped arrow pointing right by default -->
-                    <path class="arrow-path" d="M8 4 L16 12 L8 20" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                </svg>
-            </div>
-        </div>
-        <div id="tooltip-message" class="tooltip-message">AI Assistant ready - start typing your question!</div>
-        <div class="tooltip-divider"></div>
-        <input type="text" id="tooltip-input" class="tooltip-input" placeholder="Ask me anything...">
-    </div>
-
-    <script type="module" src="./src/main.ts"></script>
+    
+    
+    <link rel="stylesheet" href="/dist/style.css">
+    <script type="module">
+        import { createPlayer, validateWorkflow } from '/dist/tiptour.js'
+        const workflow = {
+          version: '1.0',
+          id: 'landing-demo',
+          steps: [
+            { type: 'message', ui: { content: 'Click the first button', arrow: ['#button-one'] } },
+            { type: 'click', selector: { css: '#button-one' } },
+            { type: 'message', ui: { content: 'Now click the second button', arrow: ['#button-two'] } },
+            { type: 'click', selector: { css: '#button-two' } }
+          ]
+        }
+        const { ok, errors } = validateWorkflow(workflow)
+        if (ok) {
+          const player = createPlayer(workflow, { mode: 'guide', includeInputUI: true, inputPlaceholder: 'Ask me anything...' })
+          player.play()
+        } else {
+          console.warn('Workflow invalid', errors)
+        }
+    </script>
     
     <!-- Supabase Waitlist Integration -->
     <script type="module">

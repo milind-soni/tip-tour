@@ -5,7 +5,13 @@ import { querySelectorBest } from './selector'
 export function createPlayer(workflow: Workflow, options: PlayerOptions = {}) {
   let idx = 0
   const mode = options.mode || 'guide'
-  const tip = new TipTour({ arrow: { enabled: true }, hideDelay: 8000 })
+  const tip = new TipTour({ arrow: { enabled: true }, hideDelay: 8000, smoothRadius: 12 })
+  if (options.includeInputUI) {
+    tip.addInput(options.inputPlaceholder || 'Ask me anything...', (v) => {
+      if (options.onInput) options.onInput(v)
+      tip.setMessage(`You typed: "${v}"`)
+    })
+  }
 
   function showStep(step: Step) {
     const content = step.ui?.content || defaultContent(step)
