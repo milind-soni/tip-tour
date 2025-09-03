@@ -1,4 +1,15 @@
 ## TipTour Workflow MVP Plan
+### What we shipped (summary)
+- Core TipTour improvements: translate3d transforms, 60fps updates, RAF pause on hide/tab-visibility, edge-aware positioning, device-pixel rounding, content sanitization, input autofocus on show.
+- Workflow layer: `createRecorder`, `createPlayer`, `validateWorkflow`, storage helpers; step types (message/click/input/waitFor/navigate); guide/auto modes; optional input UI in player.
+- Demo pages: examples/workflow.html and landing wired to workflow player.
+- Build: named exports; ES/UMD + types.
+
+### Notable defaults and knobs
+- `smoothRadius` tightened (demo uses 2-12) for closer follow to pointer.
+- Player option `includeInputUI` shows a TipTour input while guiding.
+- Simple “type to focus” pattern is possible via page-level keydown (optional).
+
 
 ### Overview
 - **Goal**: Enable recording, saving (JSON), and replaying browser workflows with TipTour overlays for guidance and optional auto-execution for safe actions.

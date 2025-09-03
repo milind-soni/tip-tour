@@ -39,7 +39,7 @@ Add TipTour to any webpage with just a few lines:
 
   <!-- Import and initialize TipTour -->
   <script type="module">
-    import TipTour from 'tiptour';
+    import { TipTour } from 'tiptour';
     
     // Create tooltip instance
     const tooltip = new TipTour({
@@ -62,6 +62,68 @@ Add TipTour to any webpage with just a few lines:
   </script>
 </body>
 </html>
+```
+
+## Workflow (Record/Play) APIs
+
+TipTour ships optional workflow utilities to record UI actions to JSON and replay them as a guided tour or auto-execution.
+
+### Quick start
+
+```html
+<script type="module">
+  import { createRecorder, createPlayer, validateWorkflow } from 'tiptour';
+
+  // Record
+  const rec = createRecorder();
+  rec.start();
+  // ...interact with the page...
+  rec.stop();
+  const wf = rec.getWorkflow('demo-flow', 'Demo Flow');
+
+  // Validate
+  const { ok, errors } = validateWorkflow(wf);
+  if (!ok) console.error(errors);
+
+  // Play (guide mode)
+  const player = createPlayer(wf, { mode: 'guide', includeInputUI: true });
+  player.play();
+</script>
+```
+
+### Workflow JSON shape
+
+```json
+{
+  "version": "1.0",
+  "id": "demo",
+  "steps": [
+    { "type": "message", "ui": { "content": "Click the button", "arrow": ["#btn"] } },
+    { "type": "click", "selector": { "css": "#btn" } },
+    { "type": "waitFor", "selector": { "css": ".done" }, "timeout": 10000 }
+  ]
+}
+```
+
+### Player options
+
+```ts
+createPlayer(workflow, {
+  mode: 'guide' | 'auto',
+  includeInputUI: true,              // adds an input to the tooltip
+  inputPlaceholder: 'Ask me...',     // optional placeholder
+  onInput: (value) => { /* ... */ }  // optional handler
+});
+```
+
+### Storage helpers
+
+```ts
+import { saveWorkflowLocal, loadWorkflowLocal, downloadWorkflow, readWorkflowFile } from 'tiptour';
+
+saveWorkflowLocal(wf);
+const restored = loadWorkflowLocal('demo-flow');
+downloadWorkflow(wf); // trigger JSON download
 ```
 
 ## Configuration Options
