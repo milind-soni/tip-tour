@@ -112,3 +112,31 @@ export function validate(workflow: unknown): { ok: boolean; errors?: string[] };
 - Cross-page multi-domain workflows, iframe traversal, visual diff selector healing, and cloud sync.
 
 
+
+### Future plans
+- Accessibility
+  - Add aria-live (polite/assertive) with role="status"/"alert" on tooltip message; aria-atomic.
+  - Label input (aria-label) and hide decorative arrow (aria-hidden).
+- Mobile/touch
+  - Pointer events: pointerdown to show/update, pointerup to schedule hide.
+  - Touch-aware offsets and optional tap-to-pin mode; follow element mode.
+- Positioning/containers
+  - Anchor/follow modes: 'cursor' | 'element'; container-relative boundaries and smart flip/shift.
+  - Scroll-into-view for targets (guarded), with gentle highlight pulse.
+- Performance
+  - Continue single RAF; passive listeners; cache tooltip size and target geometry with RO/IO invalidation.
+  - Device-pixel rounding and reduced work under prefers-reduced-motion.
+- Arrow UX
+  - Distance-based easing for rotate/scale; hide when target offscreen.
+- API ergonomics
+  - Player accepts an existing TipTour instance (avoid double tooltips when embedding).
+  - Presets for behavior (snappy/smooth/floaty) mapping to friction/radius.
+- Workflow layer
+  - Stronger selector heuristics and fallback matching; assertions and per-step UI (next/prev/skip).
+  - Guardrails: domain allowlist, dry-run, step confirmations; richer analytics hooks.
+  - Export/import editor UI and schema docs; browser extension/bookmarklet to run/play.
+  - Auto mode hardening (retries, safe timeouts) and variable prompts.
+- Docs and examples
+  - Expanded README with a11y/touch patterns and full workflow spec.
+  - Minimal framework examples (React/Vue/Svelte) and SPA route-change handling.
+
