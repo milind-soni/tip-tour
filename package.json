@@ -27,7 +27,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "watch": "nodemon -e ts,html --exec \"npm run build\"",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "keywords": [
     "tooltip",
@@ -52,11 +53,13 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "nodemon": "^3.1.4",
     "terser": "^5.31.2",
     "typescript": "^5.5.3",
     "vite": "^5.3.3",
-    "vite-plugin-dts": "^4.5.4"
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^1.6.0"
   },
   "dependencies": {}
 }

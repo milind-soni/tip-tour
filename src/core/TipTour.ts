@@ -3,6 +3,60 @@ import { Point } from './TooltipPoint'
 import { TipTourOptions, TooltipState, ArrowOptions } from '../types'
 import '../styles/tiptour.css'
 
+type NormalizedOptions = Omit<Required<TipTourOptions>, 'arrow'> & {
+  arrow: ArrowOptions
+}
+
+const DEFAULT_OFFSET = { x: 20, y: 20 }
+const DEFAULT_POINT = { x: 0, y: 0 }
+
+function ensureContainer(container?: HTMLElement): HTMLElement {
+  if (container) return container
+  if (typeof document !== 'undefined') return document.body
+  throw new Error('TipTour requires a DOM environment')
+}
+
+function normalizeArrow(arrow?: boolean | ArrowOptions): ArrowOptions {
+  if (typeof arrow === 'boolean') {
+    return { enabled: arrow }
+  }
+  if (arrow) {
+    return {
+      enabled: arrow.enabled ?? true,
+      color: arrow.color,
+      size: arrow.size,
+      targets: arrow.targets
+    }
+  }
+  return { enabled: false }
+}
+
+function normalizeOptions(options: TipTourOptions = {}): NormalizedOptions {
+  const container = ensureContainer(options.container)
+  return {
+    enabled: options.enabled ?? true,
+    smoothRadius: options.smoothRadius ?? 30,
+    friction: options.friction ?? 0.92,
+    offset: {
+      x: options.offset?.x ?? DEFAULT_OFFSET.x,
+      y: options.offset?.y ?? DEFAULT_OFFSET.y
+    },
+    initialPoint: {
+      x: options.initialPoint?.x ?? DEFAULT_POINT.x,
+      y: options.initialPoint?.y ?? DEFAULT_POINT.y
+    },
+    className: options.className ?? 'tiptour-tooltip',
+    zIndex: options.zIndex ?? 10000,
+    hideDelay: options.hideDelay ?? 5000,
+    showDelay: options.showDelay ?? 0,
+    container,
+    arrow: normalizeArrow(options.arrow),
+    onShow: options.onShow ?? (() => {}),
+    onHide: options.onHide ?? (() => {}),
+    onUpdate: options.onUpdate ?? (() => {})
+  }
+}
+
 export class TipTour {
   private smoothCursor: SmoothCursor
   private tooltip: HTMLElement
@@ -10,36 +64,21 @@ export class TipTour {
   private tooltipInput: HTMLInputElement | null = null
   private arrow: HTMLElement | null = null
   private arrowTargets: HTMLElement[] = []
-  
-  private options: Required<TipTourOptions>
+
+  private options: NormalizedOptions
   private state: TooltipState
-  
+
   private rafId: number | null = null
-  private hideTimeout: ReturnType<typeof setTimeout> | null = null
-  private showTimeout: ReturnType<typeof setTimeout> | null = null
+  private hideTimeout: number | null = null
+  private showTimeout: number | null = null
   private lastMouseEvent: MouseEvent | null = null
-  private lastUpdateAt: number = 0
-  
-  private onInputHandler: ((value: string) => void) | null = null
+  private lastUpdateAt = 0
+
+  private onInputHandler?: (value: string) => void
   
   constructor(options: TipTourOptions = {}) {
-    this.options = {
-      enabled: options.enabled !== false,
-      smoothRadius: options.smoothRadius || 30,
-      friction: options.friction || 0.92,
-      offset: options.offset || { x: 20, y: 20 },
-      initialPoint: options.initialPoint || { x: 0, y: 0 },
-      className: options.className || 'tiptour-tooltip',
-      zIndex: options.zIndex || 10000,
-      hideDelay: options.hideDelay || 5000,
-      showDelay: options.showDelay || 0,
-      container: options.container || document.body,
-      arrow: options.arrow === undefined ? false : options.arrow,
-      onShow: options.onShow || (() => {}),
-      onHide: options.onHide || (() => {}),
-      onUpdate: options.onUpdate || (() => {})
-    }
-    
+    this.options = normalizeOptions(options)
+
     this.state = {
       visible: false,
       x: this.options.initialPoint.x,
@@ -54,36 +93,38 @@ export class TipTour {
       enabled: this.options.enabled,
       initialPoint: this.options.initialPoint
     })
-    
-    this.tooltip = this.createTooltipElement()
-    this.tooltipMessage = this.tooltip.querySelector('.tiptour-message')!
-    
+
+    const { tooltip, message } = this.createTooltipElement()
+    this.tooltip = tooltip
+    this.tooltipMessage = message
+
     this.init()
   }
-  
-  private createTooltipElement(): HTMLElement {
+
+  private createTooltipElement(): { tooltip: HTMLElement; message: HTMLElement } {
     const tooltip = document.createElement('div')
     tooltip.className = this.options.className
     tooltip.style.zIndex = this.options.zIndex.toString()
-    tooltip.innerHTML = `
-      <div class="tiptour-message"></div>
-    `
-    
+
+    const message = document.createElement('div')
+    message.className = 'tiptour-message'
+    tooltip.appendChild(message)
+
     this.options.container.appendChild(tooltip)
-    return tooltip
+    return { tooltip, message }
   }
-  
+
   private createArrow(): void {
     if (this.arrow) return
-    
-    const arrowOptions = this.options.arrow as ArrowOptions
+
+    const { color = '#1a1a1a', size = 24 } = this.options.arrow
     this.arrow = document.createElement('div')
     this.arrow.className = 'tiptour-arrow'
     this.arrow.innerHTML = `
       <div class="tiptour-arrow-svg">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none">
           <path class="tiptour-arrow-path" d="M8 4 L16 12 L8 20" 
-                stroke="${arrowOptions.color || '#1a1a1a'}" 
+                stroke="${color}" 
                 stroke-width="2.5" 
                 stroke-linecap="round" 
                 stroke-linejoin="round"/>
@@ -92,18 +133,17 @@ export class TipTour {
     `
     this.tooltip.appendChild(this.arrow)
   }
-  
+
   private init(): void {
     if (this.options.enabled) {
       this.enable()
     }
-    
-    // Initialize arrow if enabled
-    if (this.options.arrow && typeof this.options.arrow === 'object' && this.options.arrow.enabled) {
+
+    if (this.options.arrow.enabled) {
       this.createArrow()
     }
   }
-  
+
   private startAnimationLoop(): void {
     const loop = () => {
       if (this.lastMouseEvent && this.state.visible) {
@@ -120,26 +160,26 @@ export class TipTour {
       this.rafId = null
     }
   }
-  
+
   private handleMouseMove = (e: MouseEvent): void => {
     this.lastMouseEvent = e
-    
+
     if (this.showTimeout) {
       clearTimeout(this.showTimeout)
     }
-    
+
     if (!this.state.visible) {
-      this.showTimeout = setTimeout(() => {
+      this.showTimeout = window.setTimeout(() => {
         this.show()
       }, this.options.showDelay)
     }
-    
+
     if (this.hideTimeout) {
       clearTimeout(this.hideTimeout)
     }
-    
+
     if (!this.tooltipInput || document.activeElement !== this.tooltipInput) {
-      this.hideTimeout = setTimeout(() => {
+      this.hideTimeout = window.setTimeout(() => {
         this.hide()
       }, this.options.hideDelay)
     }
@@ -190,8 +230,8 @@ export class TipTour {
   }
   
   private updateArrow(): void {
-    if (!this.arrow || this.arrowTargets.length === 0) return
-    
+    if (!this.arrow || !this.options.arrow.enabled || this.arrowTargets.length === 0) return
+
     const tooltipRect = this.tooltip.getBoundingClientRect()
     const tooltipCenterX = tooltipRect.left + tooltipRect.width / 2
     const tooltipCenterY = tooltipRect.top + tooltipRect.height / 2
@@ -230,11 +270,11 @@ export class TipTour {
       else if (minDistance < 100) scale = 1.3
       else if (minDistance < 150) scale = 1.2
       else if (minDistance < 250) scale = 1.1
-      
+
       arrowSvg.style.transform = `rotate(${angle}deg) scale(${scale})`
     }
   }
-  
+
   enable(): void {
     this.smoothCursor.enable()
     document.addEventListener('mousemove', this.handleMouseMove)
@@ -273,10 +313,12 @@ export class TipTour {
   setContent(content: string): void {
     this.state.content = content
     this.tooltipMessage.innerHTML = this.sanitizeHTML(content)
+    this.state.isLoading = false
   }
-  
+
   setMessage(message: string): void {
     this.tooltipMessage.textContent = message
+    this.state.isLoading = false
   }
   
   setLoading(isLoading: boolean): void {
@@ -285,7 +327,7 @@ export class TipTour {
       this.tooltipMessage.innerHTML = '<div class="tiptour-loading">Loading...</div>'
     }
   }
-  
+
   addInput(placeholder: string = 'Type here...', onInput?: (value: string) => void): void {
     if (this.tooltipInput) return
     
@@ -299,7 +341,7 @@ export class TipTour {
     this.tooltipInput.placeholder = placeholder
     this.tooltip.appendChild(this.tooltipInput)
     
-    this.onInputHandler = onInput || null
+    this.onInputHandler = onInput
     
     this.tooltipInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && this.onInputHandler) {
@@ -320,29 +362,30 @@ export class TipTour {
     
     this.tooltipInput.addEventListener('blur', () => {
       if (!this.tooltipInput!.value.trim()) {
-        this.hideTimeout = setTimeout(() => {
+        this.hideTimeout = window.setTimeout(() => {
           this.hide()
         }, this.options.hideDelay)
       }
     })
   }
-  
+
   addArrow(targets: string[] | HTMLElement[]): void {
-    // Convert selectors to elements if needed
+    if (!this.options.arrow.enabled) {
+      this.options.arrow.enabled = true
+      if (!this.arrow) {
+        this.createArrow()
+      }
+    }
+
     if (targets.length > 0 && typeof targets[0] === 'string') {
-      this.arrowTargets = (targets as string[]).map(selector => 
-        document.querySelector(selector) as HTMLElement
-      ).filter(el => el !== null)
+      this.arrowTargets = (targets as string[])
+        .map(selector => document.querySelector(selector) as HTMLElement | null)
+        .filter((el): el is HTMLElement => Boolean(el))
     } else {
       this.arrowTargets = targets as HTMLElement[]
     }
-    
-    // Create arrow if it doesn't exist
-    if (!this.arrow) {
-      this.createArrow()
-    }
   }
-  
+
   getSmoothCursor(): SmoothCursor {
     return this.smoothCursor
   }
@@ -368,8 +411,10 @@ export class TipTour {
   destroy(): void {
     this.disable()
     this.stopAnimationLoop()
-    this.tooltip.remove()
-    
+    if (this.tooltip.parentElement) {
+      this.tooltip.parentElement.removeChild(this.tooltip)
+    }
+
     if (this.hideTimeout) clearTimeout(this.hideTimeout)
     if (this.showTimeout) clearTimeout(this.showTimeout)
   }

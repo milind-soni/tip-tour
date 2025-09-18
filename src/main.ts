@@ -1,325 +1,65 @@
-import { callOpenAI } from './api';
+import { TipTour } from './core/TipTour'
+import { callOpenAI } from './api'
 
-class AITooltip {
-    private tooltip: HTMLElement;
-    private tooltipMessage: HTMLElement;
-    private tooltipInput: HTMLInputElement;
-    private arrow: HTMLElement;
-    private buttonOne: HTMLElement;
-    private buttonTwo: HTMLElement;
-    private currentTarget: HTMLElement | null = null;
-    private isHoveringTarget = false;
-    private isVisible = false;
-    private mouseX = 0;
-    private mouseY = 0;
-    private hideTimeout: ReturnType<typeof setTimeout> | null = null;
+const INITIAL_MESSAGE = 'AI assistant ready – start typing your question!'
+const ERROR_MESSAGE = 'Sorry, something went wrong. Please try again.'
 
-    constructor() {
-        this.tooltip = document.getElementById('tooltip')!;
-        this.tooltipMessage = document.getElementById('tooltip-message')!;
-        this.tooltipInput = document.getElementById('tooltip-input') as HTMLInputElement;
-        this.arrow = document.getElementById('tooltip-arrow')!;
-        this.buttonOne = document.getElementById('button-one')!;
-        this.buttonTwo = document.getElementById('button-two')!;
-        
-        this.init();
-    }
+function setupButtons(tip: TipTour) {
+  const buttonOne = document.getElementById('button-one') as HTMLButtonElement | null
+  const buttonTwo = document.getElementById('button-two') as HTMLButtonElement | null
+  if (!buttonOne || !buttonTwo) return
 
-    private init() {
-        this.setupMouseTracking();
-        this.setupKeyboardHandling();
-        this.setupInputHandling();
-        this.setupButtons();
-    }
+  const buttons = [buttonOne, buttonTwo]
+  tip.addArrow(buttons)
 
-    private setupMouseTracking() {
-        let mouseMoveTimeout: ReturnType<typeof setTimeout>;
-        let isUpdating = false;
+  const focusTooltip = () => {
+    tip.show()
+  }
 
-        document.addEventListener('mousemove', (e) => {
-            this.mouseX = e.clientX;
-            this.mouseY = e.clientY;
-            
-            // Show tooltip immediately on mouse move
-            this.showTooltip();
-            
-            // Use RAF for smooth position updates without throttling
-            if (!isUpdating) {
-                isUpdating = true;
-                requestAnimationFrame(() => {
-                    this.updateTooltipPosition();
-                    this.updateArrow();
-                    isUpdating = false;
-                });
-            }
+  buttonOne.addEventListener('mouseenter', focusTooltip)
+  buttonTwo.addEventListener('mouseenter', focusTooltip)
 
-            clearTimeout(mouseMoveTimeout);
-            // Don't set hide timer if input is focused or has content
-            if (document.activeElement !== this.tooltipInput && !this.tooltipInput.value.trim()) {
-                mouseMoveTimeout = setTimeout(() => {
-                    this.hideTooltip();
-                }, 5000); // 5 seconds timeout
-            }
-        });
-    }
+  buttonOne.addEventListener('click', (event) => {
+    tip.setContent('🎯 Nailed it! Now try the second button for more sparkles.')
+    tip.addArrow([buttonTwo])
+    focusTooltip()
+  })
 
-    private setupKeyboardHandling() {
-        document.addEventListener('keydown', (e) => {
-            if (!this.isVisible) return;
-            
-            // Don't interfere with other input elements (like the waitlist form)
-            const activeElement = document.activeElement;
-            if (activeElement && 
-                (activeElement.tagName === 'INPUT' || 
-                 activeElement.tagName === 'TEXTAREA') && 
-                activeElement !== this.tooltipInput) {
-                return; // Let other inputs handle their own keyboard events
-            }
-            
-            if (e.key === 'Escape') {
-                this.hideTooltip();
-                return;
-            }
-
-            if (e.key.length === 1 || e.key === 'Backspace') {
-                if (document.activeElement !== this.tooltipInput) {
-                    this.tooltipInput.focus();
-                }
-            }
-        });
-    }
-
-    private setupInputHandling() {
-        this.tooltipInput.addEventListener('keydown', async (e) => {
-            if (e.key === 'Enter') {
-                const userInput = this.tooltipInput.value.trim();
-                if (!userInput) return;
-
-                this.tooltipInput.value = '';
-                await this.handleUserInput(userInput);
-            }
-        });
-
-        this.tooltipInput.addEventListener('input', () => {
-            // Clear any hide timeout while typing
-            if (this.hideTimeout) {
-                clearTimeout(this.hideTimeout);
-                this.hideTimeout = null;
-            }
-            this.showTooltip();
-        });
-        
-        // Keep tooltip visible when input is focused
-        this.tooltipInput.addEventListener('focus', () => {
-            if (this.hideTimeout) {
-                clearTimeout(this.hideTimeout);
-                this.hideTimeout = null;
-            }
-            this.showTooltip();
-        });
-        
-        // Only allow hiding when input loses focus AND is empty
-        this.tooltipInput.addEventListener('blur', () => {
-            if (!this.tooltipInput.value.trim()) {
-                this.hideTimeout = setTimeout(() => {
-                    this.hideTooltip();
-                }, 3000);
-            }
-        });
-    }
-
-    private async handleUserInput(input: string) {
-        // Show loading immediately
-        this.tooltipMessage.innerHTML = '<div class="loading">Processing...</div>';
-        
-        // Keep tooltip visible during API call
-        this.showTooltip();
-        
-        try {
-            const response = await callOpenAI(input);
-            this.tooltipMessage.textContent = response;
-            // Keep tooltip visible after response for reading
-            this.showTooltip();
-            
-            // Extend visibility for reading the response
-            setTimeout(() => {
-                if (this.isVisible && document.activeElement !== this.tooltipInput) {
-                    // Allow natural hide after reading time
-                }
-            }, 5000);
-        } catch (error) {
-            this.tooltipMessage.textContent = 'Sorry, something went wrong. Please try again.';
-            console.error('Error:', error);
-        }
-    }
-
-    private showTooltip() {
-        if (!this.isVisible) {
-            this.isVisible = true;
-            this.tooltip.classList.add('visible');
-            this.updateArrow(); // Update arrow when tooltip becomes visible
-            
-            setTimeout(() => {
-                if (this.isVisible && document.activeElement !== this.tooltipInput) {
-                    this.tooltipInput.focus();
-                }
-            }, 100);
-        }
-    }
-
-    private hideTooltip() {
-        // Don't hide if input is focused or has content
-        if (document.activeElement === this.tooltipInput || this.tooltipInput.value.trim()) {
-            return;
-        }
-        
-        if (this.isVisible) {
-            this.isVisible = false;
-            this.tooltip.classList.remove('visible');
-            this.tooltipInput.blur();
-            this.tooltipMessage.textContent = 'AI Assistant ready - start typing your question!';
-        }
-    }
-
-    private updateTooltipPosition() {
-        const offset = 20;
-        // Cache dimensions to avoid reflow
-        const tooltipWidth = this.tooltip.offsetWidth;
-        const tooltipHeight = this.tooltip.offsetHeight;
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        
-        let left = this.mouseX + offset;
-        let top = this.mouseY + offset;
-
-        // Smart positioning to avoid edges
-        if (left + tooltipWidth > windowWidth) {
-            left = this.mouseX - tooltipWidth - offset;
-        }
-        
-        if (top + tooltipHeight > windowHeight) {
-            top = this.mouseY - tooltipHeight - offset;
-        }
-
-        left = Math.max(10, left);
-        top = Math.max(10, top);
-
-        // Use transform for best performance
-        this.tooltip.style.transform = `translate(${left}px, ${top}px)`;
-    }
-    
-    private setupButtons() {
-        this.buttonOne.addEventListener('click', () => {
-            this.buttonOne.textContent = '🎉 Found me!';
-            this.buttonOne.style.background = '#e8f5e9';
-            // Reset hover state and point arrow to button two
-            this.isHoveringTarget = false;
-            this.currentTarget = this.buttonTwo;
-            this.updateArrow();
-            
-            setTimeout(() => {
-                this.buttonOne.textContent = '📍 Click me!';
-                this.buttonOne.style.background = '#ffffff';
-            }, 2000);
-        });
-        
-        this.buttonTwo.addEventListener('click', () => {
-            this.buttonTwo.textContent = '🎆 Sparkles!';
-            this.buttonTwo.style.background = '#fff3e0';
-            // Reset hover state and point arrow to button one
-            this.isHoveringTarget = false;
-            this.currentTarget = this.buttonOne;
-            this.updateArrow();
-            
-            setTimeout(() => {
-                this.buttonTwo.textContent = '✨ Then me!';
-                this.buttonTwo.style.background = '#ffffff';
-            }, 2000);
-        });
-        
-        // Add hover detection for both buttons
-        this.buttonOne.addEventListener('mouseenter', () => {
-            if (this.currentTarget === this.buttonOne) {
-                this.isHoveringTarget = true;
-                this.updateArrow();
-            }
-        });
-        
-        this.buttonOne.addEventListener('mouseleave', () => {
-            if (this.currentTarget === this.buttonOne) {
-                this.isHoveringTarget = false;
-                this.updateArrow();
-            }
-        });
-        
-        this.buttonTwo.addEventListener('mouseenter', () => {
-            if (this.currentTarget === this.buttonTwo) {
-                this.isHoveringTarget = true;
-                this.updateArrow();
-            }
-        });
-        
-        this.buttonTwo.addEventListener('mouseleave', () => {
-            if (this.currentTarget === this.buttonTwo) {
-                this.isHoveringTarget = false;
-                this.updateArrow();
-            }
-        });
-        
-        // Set initial target to button one
-        this.currentTarget = this.buttonOne;
-    }
-    
-    private updateArrow() {
-        if (!this.isVisible || !this.currentTarget) return;
-        
-        // Get tooltip center position
-        const tooltipRect = this.tooltip.getBoundingClientRect();
-        const tooltipCenterX = tooltipRect.left + tooltipRect.width / 2;
-        const tooltipCenterY = tooltipRect.top + tooltipRect.height / 2;
-        
-        // Get current target button center position
-        const buttonRect = this.currentTarget.getBoundingClientRect();
-        const buttonCenterX = buttonRect.left + buttonRect.width / 2;
-        const buttonCenterY = buttonRect.top + buttonRect.height / 2;
-        
-        // Calculate angle and distance
-        const deltaX = buttonCenterX - tooltipCenterX;
-        const deltaY = buttonCenterY - tooltipCenterY;
-        const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        
-        // Rotate V arrow (arrow points right by default at 0 degrees)
-        const vArrow = this.arrow.querySelector('.v-arrow') as HTMLElement;
-        const arrowPath = this.arrow.querySelector('.arrow-path') as SVGPathElement;
-        
-        if (vArrow && arrowPath) {
-            // Enhanced scaling - more dramatic as you get closer
-            let scale = 1;
-            if (this.isHoveringTarget) {
-                scale = 1.5; // Big when hovering
-                arrowPath.setAttribute('stroke', '#10b981'); // Green when hovering
-            } else {
-                // Progressive scaling based on distance
-                if (distance < 50) {
-                    scale = 1.4;
-                } else if (distance < 100) {
-                    scale = 1.3;
-                } else if (distance < 150) {
-                    scale = 1.2;
-                } else if (distance < 250) {
-                    scale = 1.1;
-                } else if (distance < 350) {
-                    scale = 1.05;
-                }
-                arrowPath.setAttribute('stroke', '#1a1a1a'); // Black when not hovering
-            }
-            
-            vArrow.style.transform = `rotate(${angle}deg) scale(${scale})`;
-        }
-    }
+  buttonTwo.addEventListener('click', (event) => {
+    tip.setContent('✨ Stellar! Bounce back to the first button to keep the loop going.')
+    tip.addArrow([buttonOne])
+    focusTooltip()
+  })
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    new AITooltip();
-});
+function setupAIInput(tip: TipTour) {
+  tip.addInput('Ask TipTour anything…', (value) => {
+    tip.setLoading(true)
+    Promise.resolve(callOpenAI(value))
+      .then((response) => {
+        tip.setContent(response)
+        tip.show()
+      })
+      .catch(() => {
+        tip.setMessage(ERROR_MESSAGE)
+        tip.show()
+      })
+  })
+}
+
+function initDemo() {
+  const tip = new TipTour({
+    smoothRadius: 18,
+    friction: 0.9,
+    offset: { x: 24, y: 18 },
+    hideDelay: 6000,
+    showDelay: 100,
+    arrow: { enabled: true, color: '#1a1a1a' }
+  })
+
+  tip.setContent(INITIAL_MESSAGE)
+  setupAIInput(tip)
+  setupButtons(tip)
+}
+
+document.addEventListener('DOMContentLoaded', initDemo)

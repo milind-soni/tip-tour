@@ -1,11 +1,14 @@
-import { defineConfig } from 'vite'
-import { resolve } from 'path'
+import { defineConfig } from 'vitest/config'
+import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import dts from 'vite-plugin-dts'
+
+const rootDir = fileURLToPath(new URL('.', import.meta.url))
 
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: resolve(rootDir, 'src/index.ts'),
       name: 'TipTour',
       fileName: 'tiptour',
       formats: ['es', 'umd']
@@ -25,5 +28,9 @@ export default defineConfig({
       insertTypesEntry: true,
       rollupTypes: true
     })
-  ]
+  ],
+  test: {
+    environment: 'node',
+    include: ['src/**/*.{test,spec}.ts']
+  }
 })

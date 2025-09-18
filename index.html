@@ -157,92 +157,6 @@
             }
         }
 
-        #tooltip {
-            position: fixed;
-            top: 0;
-            left: 0;
-            background: white;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08),
-                        0 1px 2px rgba(0, 0, 0, 0.04);
-            padding: 20px;
-            width: 320px;
-            pointer-events: none;
-            z-index: 1000;
-            display: none;
-            font-size: 14px;
-            transform: translateZ(0); /* Force layer creation for better performance */
-            backface-visibility: hidden; /* Prevent flickering */
-            background: rgba(255, 255, 255, 0.98);
-        }
-
-        #tooltip.visible {
-            display: block;
-        }
-
-        .tooltip-message {
-            color: #333333;
-            margin-bottom: 16px;
-            min-height: 40px;
-            line-height: 1.5;
-            font-size: 14px;
-        }
-
-        .tooltip-divider {
-            border-top: 1px solid rgba(0, 0, 0, 0.06);
-            margin: 16px 0;
-        }
-
-        .tooltip-input {
-            width: 100%;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 14px;
-            outline: none;
-            font-family: inherit;
-            pointer-events: all;
-            background: rgba(0, 0, 0, 0.02);
-            transition: all 0.2s ease;
-        }
-
-        .tooltip-input:focus {
-            border-color: #111111;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
-        }
-
-        .tooltip-input::placeholder {
-            color: #999999;
-        }
-
-        .loading {
-            color: #999999;
-            font-style: normal;
-        }
-        
-        .tooltip-arrow {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .v-arrow {
-            transform-origin: center;
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        
-        .arrow-path {
-            transition: stroke 0.2s ease;
-        }
-        
         .hand-drawn-button {
             position: fixed;
             background: #ffffff;
@@ -419,30 +333,8 @@
     <button id="button-one" class="hand-drawn-button">📍 Click me!</button>
     <button id="button-two" class="hand-drawn-button">✨ Then me!</button>
 
-    
-    
-    <link rel="stylesheet" href="/dist/style.css">
-    <script type="module">
-        import { createPlayer, validateWorkflow } from '/dist/tiptour.js'
-        const workflow = {
-          version: '1.0',
-          id: 'landing-demo',
-          steps: [
-            { type: 'message', ui: { content: 'Click the first button', arrow: ['#button-one'] } },
-            { type: 'click', selector: { css: '#button-one' } },
-            { type: 'message', ui: { content: 'Now click the second button', arrow: ['#button-two'] } },
-            { type: 'click', selector: { css: '#button-two' } }
-          ]
-        }
-        const { ok, errors } = validateWorkflow(workflow)
-        if (ok) {
-          const player = createPlayer(workflow, { mode: 'guide', includeInputUI: true, inputPlaceholder: 'Ask me anything...' })
-          player.play()
-        } else {
-          console.warn('Workflow invalid', errors)
-        }
-    </script>
-    
+    <script type="module" src="/src/main.ts"></script>
+
     <!-- Supabase Waitlist Integration -->
     <script type="module">
         // Get Supabase credentials from environment variables (Vite will replace these at build time)
