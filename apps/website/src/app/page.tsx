@@ -21,7 +21,7 @@ export default function Home() {
     // Dynamically import TipTour to avoid SSR issues
     const initTipTour = async () => {
       try {
-        const { TipTour: TipTourClass } = await import("tiptour");
+        const { TipTour: TipTourClass } = await import("../lib/tiptour");
         TipTour = TipTourClass;
         
         if (tipTourRef.current) return; // Already initialized
