@@ -1,6 +1,6 @@
 [build]
   base = "apps/website"
-  command = "npm run build"
+  command = "cd ../.. && npm install && cd apps/website && npm run build"
   publish = ".next"
 
 [[redirects]]
