@@ -19,13 +19,13 @@ function setupButtons(tip: TipTour) {
   buttonOne.addEventListener('mouseenter', focusTooltip)
   buttonTwo.addEventListener('mouseenter', focusTooltip)
 
-  buttonOne.addEventListener('click', (event) => {
+  buttonOne.addEventListener('click', () => {
     tip.setContent('🎯 Nailed it! Now try the second button for more sparkles.')
     tip.addArrow([buttonTwo])
     focusTooltip()
   })
 
-  buttonTwo.addEventListener('click', (event) => {
+  buttonTwo.addEventListener('click', () => {
     tip.setContent('✨ Stellar! Bounce back to the first button to keep the loop going.')
     tip.addArrow([buttonOne])
     focusTooltip()

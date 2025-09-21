@@ -1,1 +1,0 @@
-import"./modulepreload-polyfill-B5Qt9EMX.js";import{T as o}from"./tiptour-CO9VpnFY.js";const t=new o({enabled:!0,smoothRadius:30,friction:.92,hideDelay:3e3});t.setContent("<strong>Hello!</strong><br>This is a smooth tooltip.");setTimeout(()=>{t.setContent("The content just changed!")},5e3);
