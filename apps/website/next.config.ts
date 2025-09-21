@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Reduce development warnings
+  productionBrowserSourceMaps: false,
+  
+  // Optimize for deployment
+  experimental: {
+    optimizePackageImports: ['@supabase/supabase-js']
+  }
 };
 
 export default nextConfig;

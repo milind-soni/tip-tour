@@ -19,6 +19,8 @@ export function WaitlistForm() {
     setMessage('')
 
     try {
+      console.log('Submitting email:', email.trim())
+      
       const response = await fetch('/api/waitlist', {
         method: 'POST',
         headers: {
@@ -28,6 +30,7 @@ export function WaitlistForm() {
       })
 
       const data = await response.json()
+      console.log('API Response:', data)
 
       if (response.ok) {
         setIsSuccess(true)
@@ -37,7 +40,8 @@ export function WaitlistForm() {
         setIsSuccess(false)
         setMessage(data.error || 'Something went wrong. Please try again.')
       }
-    } catch {
+    } catch (error) {
+      console.error('Fetch error:', error)
       setIsSuccess(false)
       setMessage('Something went wrong. Please try again.')
     } finally {
