@@ -221,11 +221,14 @@ cd tip-tour
 # Install dependencies
 npm install
 
-# Start development server
-npm run dev
-
-# Build for production
+# Library: build
 npm run build
+
+# Website (Next.js landing)
+cd apps/website
+npm install
+npm run dev
+# visit http://localhost:3000
 ```
 
 ## Browser Support
