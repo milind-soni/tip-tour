@@ -1,7 +1,12 @@
 [build]
   base = "apps/website"
   command = "cd ../.. && npm install && cd apps/website && npm run build"
-  publish = ".next"
+  publish = "out"
+  functions = "../../netlify/functions"
+  
+# Next.js runtime
+[build.environment]
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
 [[redirects]]
   from = "/*"

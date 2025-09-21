@@ -21,7 +21,7 @@ export function WaitlistForm() {
     try {
       console.log('Submitting email:', email.trim())
       
-      const response = await fetch('/api/waitlist', {
+      const response = await fetch('/.netlify/functions/waitlist', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
